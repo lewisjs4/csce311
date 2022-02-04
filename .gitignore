@@ -1,4 +1,8 @@
-# Custom
+# Executables
+*socket-cli-srv
+
+# Vim
+.*.sw*
 
 # Prerequisites
 *.d
