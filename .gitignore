@@ -1,5 +1,9 @@
 # Executables
-*socket-cli-srv
+fifo-manager
+fork
+fork-pipe
+sem-*
+socket-cli-srv
 
 # Vim
 .*.sw*
