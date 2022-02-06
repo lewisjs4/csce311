@@ -1,33 +1,68 @@
-# Copyright 2021  CSCE240
-cc = g++  # use g++ compiler
+srcs := producer_consumer.cc semaphore_manager.cc
 
-flags = -std=c++17  # compile with C++ 17 standard
-flags += -Wall  # compile with all warnings
-flags += -g  # produce debugging information
-#flags += -I .. # add pwd directory to src include path
-#flags += -pthread # support for POSIX threads
+exe := producer-consumer
 
-link = $(cc) $(flags) -o
-compile = $(cc) $(flags) -c
+inc_path := ..
 
-
-# fork-pipe
+# compiler
 #
-fork-pipe: fork_pipe.cc
-	$(link) $@ $^
+cc := g++
 
-
-# fifo-manager
+# locations for intermediate files
 #
-fifo-manager: fifo_manager.cc
-	$(link) $@ $^
+obj_dir := .o
+dep_dir := .d
 
-
-# socket-cli-srv
+# intermediate object files from source files
 #
-socket-cli-srv: socket_cli_srv.cc
-	$(link) $@ $^
+objs := $(patsubst %,$(obj_dir)/%.o,$(basename $(srcs)))
 
-# Clean up
+# intermediate dependency files from source files
+#
+deps := $(patsubst %,$(dep_dir)/%.d,$(basename $(srcs)))
+
+$(shell mkdir -p $(dir $(objs)) >/dev/null)
+$(shell mkdir -p $(dir $(deps)) >/dev/null)
+
+# cpp build flags
+#
+cpp_flags := -std=c++17 -g -Wall -Wextra -pedantic -I $(inc_path)
+
+# linker flags 
+#
+linker_flags :=
+
+# linker libraries
+#
+linker_libs := -pthread
+
+# flags required for dependency generation; passed to compilers
+#
+dep_flags = -MT $@ -MD -MP -MF $(dep_dir)/$*.Td
+
+# compile C++ source files
+#
+compile.cc = $(cc) $(dep_flags) $(cpp_flags) -c -o $@
+
+# link object files to binary
+#
+link.o = $(cc) $(linker_libs) -o $@
+
+all: $(exe)
+
+.PHONY: clean
 clean:
-	$(RM) fork-pipe fifo-manager socket-cli-srv
+	$(RM) -r $(obj_dir) $(dep_dir)
+
+$(exe): $(objs)
+	$(link.o) $^
+
+$(obj_dir)/%.o: src/%.cc
+$(obj_dir)/%.o: src/%.cc $(dep_dir)/%.d
+	$(compile.cc) $<
+
+.PRECIOUS: $(dep_dir)/%.d
+$(dep_dir)/%.d: ;
+
+-include $(deps)
+
