@@ -17,7 +17,7 @@
 #include <utility>
 #include <vector>
 
-#include <prod_cons/inc/semaphore_manager.h>
+#include <producer_consumer_1/inc/semaphore_manager.h>
 
 
 // Provides scoped names for the different semaphores and mutexes managed by
