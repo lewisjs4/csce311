@@ -1,5 +1,12 @@
+# Depends heavily on make dependency generation rules.
+#
+
+# place compile-able source here
+#
 srcs := producer_consumer.cc semaphore_manager.cc
 
+# place final executable name here
+#
 exe := producer-consumer
 
 inc_path := ..
