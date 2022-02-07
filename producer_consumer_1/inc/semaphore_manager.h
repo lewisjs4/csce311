@@ -1,6 +1,7 @@
 // Copyright 2021 CSCE 240
 //
-
+#ifndef PRODUCER_CONSUMER_1_INC_
+#define PRODUCER_CONSUMER_1_INC_
 
 #include <pthread.h>  // POSIX threads (use flag -pthread in g++)
 #include <semaphore.h>  // POSIX semaphore support
@@ -36,3 +37,4 @@ class ThreadSemaphoreManager {
 
 };
 
+#endif  // PRODUCER_CONSUMER_1_INC_
