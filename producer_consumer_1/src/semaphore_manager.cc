@@ -11,7 +11,6 @@ std::vector<::sem_t> ThreadSemaphoreManager::semaphores_
 
 
 size_t ThreadSemaphoreManager::Create(size_t count, int index) {
-// TODO: the automatic selection and addition of new semaphores is wrong
   assert(index <= static_cast<int>(semaphores_.size()));
 
   // create and initialize semaphore at new index

@@ -1,9 +1,5 @@
 // Copyright 2021 CSCE 240
 //
-// TODO: Need to get more data to threads (thread_id and buffer size are not there)
-//       go look at Consume function
-//
-//       Thread ID, current read pointer, buffer, buffer size
 
 #include <pthread.h>  // POSIX threads (use flag -pthread in g++)
 #include <semaphore.h>  // POSIX semaphore support
