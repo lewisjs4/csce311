@@ -1,5 +1,8 @@
 // Copyright 2021 CSCE 240
 //
+// This is an example of semaphore-synchronized single slot producer/consumer
+// problem
+//
 
 #include <pthread.h>  // POSIX threads (use flag -pthread in g++)
 #include <semaphore.h>  // POSIX semaphore support
@@ -21,8 +24,8 @@
 //
 //   Naming is from Google style guidelines. Don't blame me.
 enum class SemaphoreId : size_t {
-  kBufferAvailable = 0,
-  kItemsAvailable = 1,
+  kItemAvailable = 0,
+  kBufferAvailable = 1,
   kBufferLock = 2,
   kPrintLock = 3
 };
@@ -42,25 +45,21 @@ class SemaphoreManager : public ThreadSemaphoreManager {
 
 class Consumer {
  public:
-  Consumer(pthread_t, size_t, std::vector<size_t>*, size_t*);
+  Consumer(pthread_t, size_t, size_t*);
 
   pthread_t& id();
 
 
-  // Requests an item using SemaphoreId::kItemsAvailable
+  // Requests an item from "slot" using SemaphoreId::kItemAvailable
   // Requests access to buffer using SemaphoreId::kBufferLock
-  // "Consumes" one job from buffer
-  // Updates shared buffer read location
-  // Returns "slot" in buffer using SemaphoreId::kBufferAvailable
-  // Returns access to buffer using SemaphoreId::kBufferLock
+  // "Consumes" job from buffer
+  // Returns "slot" in buffer using SemaphoreId::kItemAvailable
   static void* Consume(void* ptr);
 
  private:
   pthread_t id_;  // consumers store their thread ids
   size_t index_;  // know their indices in the collection
-  std::vector<size_t>* buffer_;  // have a reference to the shared buffer
-  size_t* buffer_index_;  // and a reference to the shared current read point
-                          //     in the buffer
+  size_t* buffer_;  // have a reference to the shared buffer
 };
 
 
@@ -71,52 +70,44 @@ int main(/* int argc, char* argv[] */) {
   const size_t kProductionTime = 1;
   const size_t kMinConsumptionTime = 8;
   const size_t kMaxConsumptionTime = 16;
-  const size_t kNoConsumers = 4;
-
-  const size_t kBufferSize = 8;
+  const size_t kNoConsumers = 32;
 
   // create semaphores and mutexes
-  SemaphoreManager::Create(kBufferSize, SemaphoreId::kBufferAvailable);
-  SemaphoreManager::Create(0, SemaphoreId::kItemsAvailable);
+  SemaphoreManager::Create(0, SemaphoreId::kItemAvailable);
+  SemaphoreManager::Create(1, SemaphoreId::kBufferAvailable);
   SemaphoreManager::Create(1, SemaphoreId::kBufferLock);
   SemaphoreManager::Create(1, SemaphoreId::kPrintLock);
 
   // the buffer is where all "jobs" are stored, shared with threads
-  std::vector<size_t> buffer(kBufferSize);
-  size_t buffer_read_index = 0;  // stored here, shared with threads
+  size_t buffer;
 
   // consumers contain thread id, reference to buffer, and reference to
   //     buffer's read index
   std::vector<::Consumer> consumers;
   for (size_t i = 0; i < kNoConsumers; ++i)
-    consumers.push_back(
-      ::Consumer(pthread_t(), i, &buffer, &buffer_read_index));
+    consumers.push_back(::Consumer(pthread_t(), i, &buffer));
 
   for (auto& consumer : consumers)
     pthread_create(&consumer.id(),
                    nullptr,  // restrictions (read on your own)
-                   Consumer::Consume,  // pointer to function
+                   ::Consumer::Consume,  // pointer to function
                    static_cast<void *>(&consumer));  // thread index
 
-  size_t buffer_write_index = 0;
   while (true) {
     SemaphoreManager::Down(SemaphoreId::kPrintLock);
-    std::cout << "Producer: producing at buffer[" << buffer_write_index
-      << "]" << std::endl;
+    std::cout << "Producer: producing for buffer" << std::endl;
     SemaphoreManager::Up(SemaphoreId::kPrintLock);
 
     ::sleep(kProductionTime);
 
-    SemaphoreManager::Down(SemaphoreId::kBufferLock);
-
-    buffer[buffer_write_index] = kMinConsumptionTime
-      + ::rand() % (kMaxConsumptionTime - kMinConsumptionTime + 1);
-    buffer_write_index = ((buffer_write_index + 1) % kBufferSize);
-    SemaphoreManager::Up(SemaphoreId::kBufferLock);
-
-    SemaphoreManager::Up(SemaphoreId::kItemsAvailable);
     SemaphoreManager::Down(SemaphoreId::kBufferAvailable);
 
+    SemaphoreManager::Down(SemaphoreId::kBufferLock);
+    buffer = kMinConsumptionTime
+      + ::rand() % (kMaxConsumptionTime - kMinConsumptionTime + 1);
+    SemaphoreManager::Up(SemaphoreId::kBufferLock);
+
+    SemaphoreManager::Up(SemaphoreId::kItemAvailable);
 
     SemaphoreManager::Down(SemaphoreId::kPrintLock);
     std::cout << "Producer: completed" << std::endl;
@@ -136,25 +127,21 @@ void* Consumer::Consume(void *ptr) {
   auto consumer = static_cast<Consumer *>(ptr);
 
   while (true) {
-    SemaphoreManager::Down(SemaphoreId::kItemsAvailable);
-
-    SemaphoreManager::Down(SemaphoreId::kBufferLock);
+    SemaphoreManager::Down(SemaphoreId::kItemAvailable);
 
     SemaphoreManager::Down(SemaphoreId::kPrintLock);
     std::cout << "\tConsumer " << consumer->index_
-      << ": consuming from buffer[" << *consumer->buffer_index_ << "]";
+      << ": consuming from buffer";
     SemaphoreManager::Up(SemaphoreId::kPrintLock);
 
-    size_t consumption_time = consumer->buffer_->at(*consumer->buffer_index_);
-    *consumer->buffer_index_ = (*consumer->buffer_index_ + 1)
-      % consumer->buffer_->size();
-
+    SemaphoreManager::Down(SemaphoreId::kBufferLock);
+    size_t consumption_time = *consumer->buffer_;
     SemaphoreManager::Up(SemaphoreId::kBufferAvailable);
-
     SemaphoreManager::Up(SemaphoreId::kBufferLock);
 
     SemaphoreManager::Down(SemaphoreId::kPrintLock);
-    std::cout << ", " << consumption_time << " seconds to complete" << std::endl;
+    std::cout << ", " << consumption_time << " seconds to complete"
+      << std::endl;
     SemaphoreManager::Up(SemaphoreId::kPrintLock);
 
     sleep(consumption_time);
@@ -171,11 +158,7 @@ void* Consumer::Consume(void *ptr) {
 
 Consumer::Consumer(pthread_t id,
                    size_t index,
-                   std::vector<size_t>* buffer,
-                   size_t* buffer_index) : id_(id),
-                                           index_(index),
-                                           buffer_(buffer),
-                                           buffer_index_(buffer_index) {
+                   size_t* buffer) : id_(id), index_(index), buffer_(buffer) {
   // empty
 }
 
