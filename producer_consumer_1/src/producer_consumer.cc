@@ -23,7 +23,7 @@
 //     ThreadSemaphoreManager
 //
 //   Naming is from Google style guidelines. Don't blame me.
-enum class SemaphoreId : size_t {
+enum class SemaphoreId : int {
   kItemAvailable = 0,
   kBufferAvailable = 1,
   kBufferLock = 2,
@@ -67,16 +67,16 @@ class Consumer {
 int main(/* int argc, char* argv[] */) {
   ::srand(::time(nullptr));
 
-  const size_t kProductionTime = 1;
+  const size_t kProductionTime = 4;
   const size_t kMinConsumptionTime = 8;
   const size_t kMaxConsumptionTime = 16;
   const size_t kNoConsumers = 32;
 
   // create semaphores and mutexes
-  SemaphoreManager::Create(0, SemaphoreId::kItemAvailable);
-  SemaphoreManager::Create(1, SemaphoreId::kBufferAvailable);
-  SemaphoreManager::Create(1, SemaphoreId::kBufferLock);
-  SemaphoreManager::Create(1, SemaphoreId::kPrintLock);
+  ::SemaphoreManager::Create(0, ::SemaphoreId::kItemAvailable);
+  ::SemaphoreManager::Create(1, ::SemaphoreId::kBufferAvailable);
+  ::SemaphoreManager::Create(1, ::SemaphoreId::kBufferLock);
+  ::SemaphoreManager::Create(1, ::SemaphoreId::kPrintLock);
 
   // the buffer is where all "jobs" are stored, shared with threads
   size_t buffer;
@@ -121,6 +121,7 @@ int main(/* int argc, char* argv[] */) {
 
   return 0;
 }
+
 
 
 void* Consumer::Consume(void *ptr) {
