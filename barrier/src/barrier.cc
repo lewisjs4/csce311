@@ -1,4 +1,4 @@
-// Copyright 2021 CSCE 240
+// Copyright 2022 CSCE 311
 //
 
 #include <pthread.h>  // POSIX threads (use flag -pthread in g++)

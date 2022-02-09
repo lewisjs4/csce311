@@ -1,4 +1,4 @@
-// Copyright 2021 CSCE 240
+// Copyright 2022 CSCE 311
 //
 // This is an example of semaphore-synchronized multi-slot produce/consumer
 // problem.
