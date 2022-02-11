@@ -79,7 +79,7 @@ int main(/* int argc, char* argv[] */) {
   const size_t kMaxConsumptionTime = 16;
   const size_t kNoConsumers = 8;
 
-  const size_t kBufferSize = 16;
+  const size_t kBufferSize = 8;
 
   // create semaphores and mutexes
   SemaphoreManager::Create(kBufferSize, SemaphoreId::kBufferAvailable);
