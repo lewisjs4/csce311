@@ -111,6 +111,8 @@ int main(/* int argc, char* argv[] */) {
 
     ::sleep(kProductionTime);
 
+    ::SemaphoreManager::Down(SemaphoreId::kBufferAvailable);
+
     ::SemaphoreManager::Down(SemaphoreId::kBufferLock);
 
     buffer[buffer_write_index] = kMinConsumptionTime
@@ -120,7 +122,6 @@ int main(/* int argc, char* argv[] */) {
     ::SemaphoreManager::Up(SemaphoreId::kBufferLock);
 
     ::SemaphoreManager::Up(SemaphoreId::kItemsAvailable);
-    ::SemaphoreManager::Down(SemaphoreId::kBufferAvailable);
 
 
     PrintThreaded("Producer: completed\n");
