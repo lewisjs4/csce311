@@ -126,18 +126,18 @@ size_t WorkerWithBarrier::barrier_complete_total_ = 0;
 //     WorkerWithBarrier::SetBarrierNumber() invoked to set barrier completion
 //     number
 //
-void WorkerWithBarrier::Barrier() {
-  SemaphoreManager::Down(SemaphoreId::kBarrierLock);
+void ::WorkerWithBarrier::Barrier() {
+  ::SemaphoreManager::Down(::SemaphoreId::kBarrierLock);
 
   ++barrier_complete_total_;
 
   if (barrier_complete_count_ == barrier_complete_total_)
     for (size_t i = 0; i < barrier_complete_count_; ++i)
-      SemaphoreManager::Up(SemaphoreId::kBarrier);
+      ::SemaphoreManager::Up(::SemaphoreId::kBarrier);
 
-  SemaphoreManager::Up(SemaphoreId::kBarrierLock);
+  ::SemaphoreManager::Up(::SemaphoreId::kBarrierLock);
 
-  SemaphoreManager::Down(SemaphoreId::kBarrier);
+  ::SemaphoreManager::Down(::SemaphoreId::kBarrier);
 }
 
 

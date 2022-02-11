@@ -2,7 +2,7 @@
 //
 
 
-#include <readers_writers_2/inc/semaphore_manager.h>
+#include <readers_writers/inc/semaphore_manager.h>
 
 
 // init the semaphores_

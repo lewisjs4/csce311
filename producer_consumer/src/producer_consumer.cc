@@ -4,6 +4,9 @@
 // problem.
 //
 
+
+#include <producer_consumer/inc/semaphore_manager.h>
+
 #include <pthread.h>  // POSIX threads (use flag -pthread in g++)
 #include <semaphore.h>  // POSIX semaphore support
 #include <unistd.h>  // UNIX standard header (sleep)
@@ -15,8 +18,6 @@
 #include <iostream>
 #include <utility>
 #include <vector>
-
-#include <producer_consumer_1/inc/semaphore_manager.h>
 
 
 // Provides scoped names for the different semaphores and mutexes managed by
@@ -67,6 +68,8 @@ class Consumer {
 };
 
 
+void PrintThreaded(const std::string& msg);
+
 
 int main(/* int argc, char* argv[] */) {
   ::srand(::time(nullptr));
@@ -103,10 +106,8 @@ int main(/* int argc, char* argv[] */) {
 
   size_t buffer_write_index = 0;
   while (true) {
-    ::SemaphoreManager::Down(SemaphoreId::kPrintLock);
-    std::cout << "Producer: producing at buffer[" << buffer_write_index
-      << "]" << std::endl;
-    ::SemaphoreManager::Up(SemaphoreId::kPrintLock);
+    PrintThreaded("Producer: producing at buffer["
+      + std::to_string(buffer_write_index) + "]\n");
 
     ::sleep(kProductionTime);
 
@@ -114,6 +115,7 @@ int main(/* int argc, char* argv[] */) {
 
     buffer[buffer_write_index] = kMinConsumptionTime
       + ::rand() % (kMaxConsumptionTime - kMinConsumptionTime + 1);
+
     buffer_write_index = ((buffer_write_index + 1) % kBufferSize);
     ::SemaphoreManager::Up(SemaphoreId::kBufferLock);
 
@@ -121,9 +123,7 @@ int main(/* int argc, char* argv[] */) {
     ::SemaphoreManager::Down(SemaphoreId::kBufferAvailable);
 
 
-    ::SemaphoreManager::Down(SemaphoreId::kPrintLock);
-    std::cout << "Producer: completed" << std::endl;
-    ::SemaphoreManager::Up(SemaphoreId::kPrintLock);
+    PrintThreaded("Producer: completed\n");
   }
 
   for (auto& consumer : consumers)
@@ -143,29 +143,22 @@ void* ::Consumer::Consume(void *ptr) {
 
     ::SemaphoreManager::Down(::SemaphoreId::kBufferLock);
 
-    ::SemaphoreManager::Down(::SemaphoreId::kPrintLock);
-    std::cout << "\tConsumer " << consumer->index_
-      << ": consuming from buffer[" << *consumer->buffer_index_ << "]";
-    ::SemaphoreManager::Up(::SemaphoreId::kPrintLock);
-
     size_t consumption_time = consumer->buffer_->at(*consumer->buffer_index_);
     *consumer->buffer_index_ = (*consumer->buffer_index_ + 1)
       % consumer->buffer_->size();
+
+    ::PrintThreaded("\tConsumer " + std::to_string(consumer->index_)
+      + ": consuming from buffer[" + std::to_string(*consumer->buffer_index_)
+      + "], " + std::to_string(consumption_time) + "s to complete\n");
 
     ::SemaphoreManager::Up(::SemaphoreId::kBufferAvailable);
 
     ::SemaphoreManager::Up(::SemaphoreId::kBufferLock);
 
-    ::SemaphoreManager::Down(::SemaphoreId::kPrintLock);
-    std::cout << ", " << consumption_time << " seconds to complete" << std::endl;
-    ::SemaphoreManager::Up(::SemaphoreId::kPrintLock);
-
     ::sleep(consumption_time);
 
-    ::SemaphoreManager::Down(::SemaphoreId::kPrintLock);
-    std::cout << "\tConsumer " << consumer->index_ << ": completed after "
-      << consumption_time << " seconds" << std::endl;
-    ::SemaphoreManager::Up(::SemaphoreId::kPrintLock);
+    ::PrintThreaded("\tConsumer " + std::to_string(consumer->index_)
+      + ": completed after " + std::to_string(consumption_time) + "s\n");
   }
 
   return ptr;
@@ -200,5 +193,13 @@ void SemaphoreManager::Down(SemaphoreId id) {
 
 void SemaphoreManager::Up(SemaphoreId id) {
   ThreadSemaphoreManager::Up(static_cast<int>(id));
+}
+
+void PrintThreaded(const std::string& msg) {
+  ::SemaphoreManager::Down(::SemaphoreId::kPrintLock);
+
+  std::cout << msg;
+
+  ::SemaphoreManager::Up(::SemaphoreId::kPrintLock);
 }
 

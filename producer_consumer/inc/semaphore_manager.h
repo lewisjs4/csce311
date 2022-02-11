@@ -1,7 +1,8 @@
 // Copyright 2022 CSCE 311
 //
-#ifndef PRODUCER_CONSUMER_1_INC_
-#define PRODUCER_CONSUMER_1_INC_
+#ifndef PRODUCER_CONSUMER_INC_SEMAPHORE_MANAGER_H_
+#define PRODUCER_CONSUMER_INC_SEMAPHORE_MANAGER_H_
+
 
 #include <pthread.h>  // POSIX threads (use flag -pthread in g++)
 #include <semaphore.h>  // POSIX semaphore support
@@ -14,7 +15,7 @@
 
 class ThreadSemaphoreManager {
  public:
-  static size_t Create(size_t count, int index = 0);
+  static size_t Create(size_t count, size_t index = 0);
 
   inline static void Destroy() {
     for (::sem_t& mutex : semaphores_)
@@ -22,19 +23,18 @@ class ThreadSemaphoreManager {
   }
 
 
-  inline static void Down(size_t index=0) {
+  inline static void Down(size_t index = 0) {
     ::sem_wait(&(semaphores_.at(index)));
   }
 
 
-  inline static void Up(size_t index=0) {
+  inline static void Up(size_t index = 0) {
     ::sem_post(&(semaphores_.at(index)));
   }
 
 
  private:
   static std::vector<::sem_t> semaphores_;
-
 };
 
-#endif  // PRODUCER_CONSUMER_1_INC_
+#endif  // PRODUCER_CONSUMER_INC_SEMAPHORE_MANAGER_H_

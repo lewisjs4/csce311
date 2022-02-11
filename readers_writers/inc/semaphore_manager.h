@@ -1,7 +1,7 @@
 // Copyright 2022 CSCE 311
 //
-#ifndef READERS_WRITERS_2_INC_SEMAPHORE_MANAGER_H_
-#define READERS_WRITERS_2_INC_SEMAPHORE_MANAGER_H_
+#ifndef READERS_WRITERS_INC_SEMAPHORE_MANAGER_H_
+#define READERS_WRITERS_INC_SEMAPHORE_MANAGER_H_
 
 #include <pthread.h>  // POSIX threads (use flag -pthread in g++)
 #include <semaphore.h>  // POSIX semaphore support
@@ -41,4 +41,4 @@ class ThreadSemaphoreManager {
 
 };
 
-#endif  // READERS_WRITERS_2_INC_SEMAPHORE_MANAGER_H_
+#endif  // READERS_WRITERS_INC_SEMAPHORE_MANAGER_H_

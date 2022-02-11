@@ -1,20 +1,19 @@
-// Copyright 2022 CSCE311
+// Copyright 2022 CSCE 311
 //
 
-
-#include <producer_consumer_1/inc/semaphore_manager.h>
+#include <producer_consumer/inc/semaphore_manager.h>
 
 
 // init the semaphores_
-std::vector<::sem_t> ThreadSemaphoreManager::semaphores_ 
+std::vector<::sem_t> ThreadSemaphoreManager::semaphores_
   = std::vector<::sem_t>();
 
 
-size_t ThreadSemaphoreManager::Create(size_t count, int index) {
-  assert(index <= static_cast<int>(semaphores_.size()));
+size_t ::ThreadSemaphoreManager::Create(size_t count, size_t index) {
+  assert(index <= semaphores_.size());
 
   // create and initialize semaphore at new index
-  if (index == static_cast<int>(semaphores_.size())) {
+  if (index == semaphores_.size()) {
     semaphores_.push_back(::sem_t());
     ::sem_init(&(semaphores_.back()), 0, count);
 
@@ -25,6 +24,7 @@ size_t ThreadSemaphoreManager::Create(size_t count, int index) {
   ::sem_destroy(&semaphores_[index]);
   semaphores_[index] = ::sem_t();
   ::sem_init(&semaphores_[index], 0, count);
+
   return index;
 }
 

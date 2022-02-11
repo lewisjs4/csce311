@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include <readers_writers_2/inc/semaphore_manager.h>
+#include <readers_writers/inc/semaphore_manager.h>
 
 
 // Provides scoped names for the different semaphores and mutexes managed by
@@ -71,7 +71,7 @@ void ThreadedPrint(const char*);
 int main(/* int argc, char* argv[] */) {
   ::srand(::time(nullptr));
 
-  const size_t kWriteTime= 1;
+  const size_t kWriteTime = 2;
   const size_t kNoReaders = 4;
   const size_t kMinWaitTime = 4;
   const size_t kMaxWaitTime = 6;
@@ -126,7 +126,7 @@ int main(/* int argc, char* argv[] */) {
 
 
 void* Reader::Read(void *ptr) {
-  const size_t kMinReadTime = 4;
+  const size_t kMinReadTime = 6;
   const size_t kMaxReadTime = 8;
 
   auto reader = static_cast<Reader *>(ptr);
