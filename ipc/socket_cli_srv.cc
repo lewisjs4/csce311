@@ -152,7 +152,7 @@ class DomainSocketClient : public UnixDomainSocket {
     }
 
     // (3) write to socket
-    ssize_t kWrite_buffer_size = 64;
+    const ssize_t kWrite_buffer_size = 64;
     char write_buffer[kWrite_buffer_size];
     while (true) {
       std::cin.getline(write_buffer, kWrite_buffer_size);

@@ -33,7 +33,7 @@ $(shell mkdir -p $(dir $(deps)) >/dev/null)
 
 # cpp build flags
 #
-cpp_flags := -std=c++17 -g -Wall -Wextra -pedantic -I $(inc_path)
+cpp_flags := -std=c++17 -g -Wall -Wextra -pedantic -I $(inc_path) # -no-pie
 
 # linker flags 
 #
