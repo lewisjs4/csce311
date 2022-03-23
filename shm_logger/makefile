@@ -3,13 +3,13 @@
 
 # place compile-able source here
 #
-consumer_srcs := consumer.cc consumer.h named_semaphore.h named_semaphore.cc
-producer_srcs := producer.cc producer.h named_semaphore.h named_semaphore.cc
+consumer_srcs := writer.cc consumer.cc consumer.h named_semaphore.h named_semaphore.cc
+producer_srcs := generator.cc producer.cc producer.h named_semaphore.h named_semaphore.cc
 
 # place final executable name here
 #
-consumer_exe := consumer
-producer_exe := producer
+consumer_exe := writer
+producer_exe := generator
 
 inc_path := ..
 
