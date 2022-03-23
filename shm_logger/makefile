@@ -4,7 +4,7 @@
 # place compile-able source here
 #
 consumer_srcs := consumer.cc consumer.h named_semaphore.h named_semaphore.cc
-producer_srcs := producer.cc named_semaphore.h named_semaphore.cc
+producer_srcs := producer.cc producer.h named_semaphore.h named_semaphore.cc
 
 # place final executable name here
 #
