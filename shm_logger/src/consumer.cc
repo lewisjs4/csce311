@@ -18,7 +18,7 @@ Consumer::Consumer(const char* shm_name, const char* shm_log_signal_name)
   }
 
   // set size of shared memory with file descriptor
-  const size_t kBuffer_size = 255;  // starts with one allocated char
+  const size_t kBuffer_size = 4096 - sizeof(size_t);  // page - buffer_size size
   const size_t kSHM_size = sizeof(SharedMemoryStore) + kBuffer_size;
   if (::ftruncate(shm_fd, kSHM_size) < 0) {
     std::cerr << ::strerror(errno) << std::endl;
@@ -39,7 +39,7 @@ Consumer::Consumer(const char* shm_name, const char* shm_log_signal_name)
 
   // init memory map
   *store_ = {};
-  store_->buffer_size = kBuffer_size;
+  store_->buffer_size = kBuffer_size;  // set store's buffer size
 
   // create signal mux (unlocked by producer(s))
   shm_log_signal_.Create(0);
@@ -59,6 +59,7 @@ Consumer::~Consumer() {
   if (::shm_unlink(shm_name_) < 0)
     std::cerr << ::strerror(errno) << std::endl;
 
+  // delete named semaphore
   shm_log_signal_.Destroy();
 
   ::exit(errno);

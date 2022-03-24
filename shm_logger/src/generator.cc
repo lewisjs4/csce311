@@ -17,8 +17,17 @@ int main(int argc, char* argv[]) {
   char buffer[kBuffer_size];
   std::cin.getline(buffer, kBuffer_size);
   buffer[std::cin.gcount() + 1] = '\n';
-
-  log_writer.Produce(std::string(buffer));
+  std::string msg(buffer);
+  std::cout << "Bytes read: " << std::cin.gcount() << std::endl;
+  while (std::cin.gcount() == kBuffer_size - 1) {
+    std::cin.clear();
+    std::cin.getline(buffer, kBuffer_size);
+    std::cout << "Bytes read: " << std::cin.gcount() << std::endl;
+    buffer[std::cin.gcount() + 1] = '\0';
+    msg += buffer;
+  }
+  std::cout << "Sent: " << msg << std::endl;
+  log_writer.Produce(std::string(msg));
 
   return 0;
 }
