@@ -18,7 +18,7 @@ Consumer::Consumer(const char* shm_name, const char* shm_log_signal_name)
   }
 
   // set size of shared memory with file descriptor
-  const size_t kBuffer_size = 4096 - sizeof(size_t);  // page - buffer_size size
+  const size_t kBuffer_size = 4096 - sizeof(SharedMemoryStore);  // page - buffer_size size
   const size_t kSHM_size = sizeof(SharedMemoryStore) + kBuffer_size;
   if (::ftruncate(shm_fd, kSHM_size) < 0) {
     std::cerr << ::strerror(errno) << std::endl;
@@ -29,7 +29,7 @@ Consumer::Consumer(const char* shm_name, const char* shm_log_signal_name)
   // get copy of mapped mem
   const int kProt = PROT_READ | PROT_WRITE;
   store_ = static_cast<SharedMemoryStore*>(
-    ::mmap(nullptr, sizeof(SharedMemoryStore), kProt, MAP_SHARED, shm_fd, 0));
+    ::mmap(nullptr, kSHM_size, kProt, MAP_SHARED, shm_fd, 0));
 
   if (store_ == MAP_FAILED) {
     std::cerr << ::strerror(errno) << std::endl;
