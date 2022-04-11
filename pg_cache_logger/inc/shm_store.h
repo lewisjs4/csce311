@@ -1,7 +1,7 @@
 // Copyright 2022 CSCE 311
 //
-#ifndef SHM_LOGGER_INC_SHM_STORE_H_
-#define SHM_LOGGER_INC_SHM_STORE_H_
+#ifndef PG_CACHE_LOGGER_INC_PG_CACHE_STORE_H_
+#define PG_CACHE_LOGGER_INC_PG_CACHE_STORE_H_
 
 
 #include <cstddef>  // size_t
@@ -13,4 +13,4 @@ struct SharedMemoryStore {
 };
 
 
-#endif  // SHM_LOGGER_INC_SHM_STORE_H_
+#endif  // PG_CACHE_LOGGER_INC_PG_CACHE_STORE_H_

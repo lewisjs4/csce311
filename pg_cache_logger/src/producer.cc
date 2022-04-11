@@ -52,7 +52,7 @@ int Producer::Produce(const std::string& msg) {
 
   // make file big enough
   if (static_cast<unsigned long int>(buf_size) < msg.length() + 1)
-    if (::fallocate(buf_fd, 0, 0, msg.length() + 1) < 0)
+    if (::fallocate(buf_fd, 0, 0, msg.length() + 1) < 0)  // need to add \n
       HandleError("fallocate");
   char *buf_file_addr = static_cast<char *>(::mmap(nullptr,
                                                    msg.length() + 1,

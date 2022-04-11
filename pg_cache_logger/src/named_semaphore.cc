@@ -2,7 +2,7 @@
 //
 
 
-#include <wrappers/inc/named_semaphore.h>
+#include <pg_cache_logger/inc/named_semaphore.h>
 
 namespace wrappers {
 

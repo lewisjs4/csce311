@@ -1,7 +1,7 @@
 // Copyright 2022 CSCE 311
 //
-#ifndef SHM_LOGGER_INC_PRODUCER_H_
-#define SHM_LOGGER_INC_PRODUCER_H_
+#ifndef PG_CACHE_LOGGER_INC_PRODUCER_H_
+#define PG_CACHE_LOGGER_INC_PRODUCER_H_
 
 #include <pg_cache_logger/inc/named_semaphore.h>
 
@@ -37,4 +37,4 @@ class Producer {
 }  // namespace logger
 
 
-#endif  // SHM_LOGGER_INC_PRODUCER_H_
+#endif  // PG_CACHE_LOGGER_INC_PRODUCER_H_

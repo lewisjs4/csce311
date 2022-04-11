@@ -1,7 +1,7 @@
 // Copyright 2022 CSCE 311
 //
-#ifndef WRAPPERS_INC_NAMED_SEMAPHORE_H_
-#define WRAPPERS_INC_NAMED_SEMAPHORE_H_
+#ifndef PG_CACHE_LOGGER_INC_NAMED_SEMAPHORE_H_
+#define PG_CACHE_LOGGER_INC_NAMED_SEMAPHORE_H_
 
 
 #include <fcntl.h>  // POSIX open flags (O_CREAT, O_RD, O_RDWR, O_WR)
@@ -60,4 +60,4 @@ class NamedSemaphore {
 }  // namespace wrappers
 
 
-#endif  // WRAPPERS_INC_NAMED_SEMAPHORE_H_
+#endif  // PG_CACHE_LOGGER_INC_NAMED_SEMAPHORE_H_
