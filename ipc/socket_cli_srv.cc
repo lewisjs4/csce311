@@ -1,4 +1,4 @@
-// Copyright 2022 CSCE 311
+// Copyright 2023 CSCE 311
 //
 
 #include <sys/socket.h>  // Unix header for sockets, using socket
@@ -17,27 +17,42 @@
 
 class UnixDomainSocket {
  public:
-  explicit UnixDomainSocket(const char *socket_path) {
+  ///
+  /// Initializes the socket address struct (::sockaddr_un)
+  ///
+  /// @param socket_path A null-terminated C-string containing the shared path
+  ///                    name for socket.
+  /// @param abstract Defaults to abstract socket path names, pass false for
+  ///                 non-abstract naming.
+  /// 
+  explicit UnixDomainSocket(const char *socket_path, bool abstract = true) {
     socket_path_ = std::string(socket_path);  // std::string manages char *
 
-    sock_addr_ = {};  // init struct (replaces memset)
+    sock_addr_ = {};  // init struct (replaces memset from C)
     sock_addr_.sun_family = AF_UNIX;  // set to Unix domain socket (e.g. instead
                                       //   of internet domain socket)
-    // leaving leading null char sets abstract socket
-    strncpy(sock_addr_.sun_path + 1,  // use strncpy to limit copy for
-            socket_path,              //   portability
-            sizeof(sock_addr_.sun_path) - 2);  // -2 for leading/trailing \0s
+    if (abstract)                                  
+      // leaving leading null char sets abstract socket
+      strncpy(sock_addr_.sun_path + 1,           // strncpy to limit copy for
+              socket_path,                       //   portability
+              sizeof(sock_addr_.sun_path) - 1);  // -2 for leading/trailing \0s
+    else
+      // copy string from socket path without leading \0
+      strncpy(sock_addr_.sun_path,               // strncpy to limit copy for
+              socket_path,                       //   portability
+              sizeof(sock_addr_.sun_path));  //
   }
 
  protected:
   ::sockaddr_un sock_addr_;  // socket address from sys/un.h
 
-  std::string socket_path_;  // let std::string manage char *
+  std::string socket_path_;  // std::string stores socket_path (no raw pointers)
 };
 
 
-// Domain Socket Server C++ Interface Class
-//
+///
+/// Domain Socket Server C++ Interface Class
+///
 class DomainSocketServer : public UnixDomainSocket {
  public:
   using ::UnixDomainSocket::UnixDomainSocket;
@@ -57,10 +72,10 @@ class DomainSocketServer : public UnixDomainSocket {
     }
 
     // (2) bind socket to address for the server
-    unlink(socket_path_.c_str());  // sys call to delete file if it exists
-                                   // already using Unix system calls for
+    unlink(socket_path_.c_str());  // sys call to delete file if it already
+                                   //   exists (using Unix system calls for
                                    //   sockets, no reason to be non-Unix
-                                   //   portable now.  :-/
+                                   //   portable now).  :-/
     int success = bind(sock_fd,
                        // sockaddr_un is a Unix sockaddr and so may be cast "up"
                        //   to that pointer type (think of it as C polymorphism)
@@ -69,6 +84,8 @@ class DomainSocketServer : public UnixDomainSocket {
                        //   i.e., there may be a size difference between parent
                        //   and child
                        sizeof(sock_addr_));
+
+    // log errors
     if (success < 0) {
       std::cerr << strerror(errno) << std::endl;
       exit(-1);
@@ -82,7 +99,7 @@ class DomainSocketServer : public UnixDomainSocket {
       exit(-1);
     }
 
-    const size_t kRead_buffer_size = 32;
+    const size_t kRead_buffer_size = 32;  // read 4 byte increaments
     char read_buffer[kRead_buffer_size];
     int bytes_read;
     while (true) {
@@ -104,7 +121,7 @@ class DomainSocketServer : public UnixDomainSocket {
           std::cout << "Server shutting down..." << std::endl;
 
           bytes_read = 0;  // message handled, disconnect client
-          break;
+          exit(0);
         }
 
         std::cout << "read " << bytes_read << " bytes: ";
@@ -127,8 +144,9 @@ class DomainSocketServer : public UnixDomainSocket {
 };
 
 
-// Domain Socket Client C++ Interface Class
-//
+///
+/// Domain Socket Client C++ Interface Class
+///
 class DomainSocketClient : public UnixDomainSocket {
  public:
   using UnixDomainSocket::UnixDomainSocket;
@@ -181,6 +199,7 @@ class DomainSocketClient : public UnixDomainSocket {
 
 
 const char kSocket_path[] = "socket_cli_srv_domain_socket";
+
 int main(int argc, char *argv[]) {
   if (argc != 2)
     return 1;

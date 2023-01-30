@@ -40,3 +40,9 @@ socket-cli-srv
 *.exe
 *.out
 *.app
+
+# Documentation
+ipc/latex
+ipc/html
+*Doxyfile
+

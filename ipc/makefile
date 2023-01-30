@@ -1,33 +1,42 @@
-# Copyright 2021  CSCE240
+# Copyright 2023 CSCE 311
+
 cc = g++  # use g++ compiler
+path = ..
+standard = c++17
 
-flags = -std=c++17  # compile with C++ 17 standard
+flags = -std=$(standard)  # compile with standard
 flags += -Wall  # compile with all warnings
-flags += -g  # produce debugging information
-#flags += -I .. # add pwd directory to src include path
-#flags += -pthread # support for POSIX threads
+flags += -pedantic  # even more warnings
+flags += -I $(path)  # add parent to preprocessor include path
+flags += -g  # include gdb instrumentation
 
-link = $(cc) $(flags) -o
-compile = $(cc) $(flags) -c
+link = $(cc) $(flags) -o  # final linked build to binary executable
+
+compile = $(cc) $(flags) -c -o  # compilation to intermediary .o files
 
 
-# fork-pipe
+# executables
 #
-fork-pipe: fork_pipe.cc
+fork-pipe : fork_pipe.o
+	$(link) $@ $^
+#
+fifo-manager: fifo_manager.o
+	$(link) $@ $^
+#
+socket-cli-srv: socket_cli_srv.o
 	$(link) $@ $^
 
-
-# fifo-manager
+# objects
 #
-fifo-manager: fifo_manager.cc
-	$(link) $@ $^
-
-
-# socket-cli-srv
+fork_pipe.o : fork_pipe.cc
+	$(compile) $@ $<
 #
-socket-cli-srv: socket_cli_srv.cc
-	$(link) $@ $^
+fifo_manager.o : fifo_manager.cc
+	$(compile) $@ $<
+#
+socket_cli_srv.o : socket_cli_srv.cc
+	$(compile) $@ $<
 
-# Clean up
 clean:
-	$(RM) fork-pipe fifo-manager socket-cli-srv
+	$(RM) *.o
+
