@@ -17,3 +17,6 @@
   - race\_condition.cc
   - lamports\_algo.cc
   - makefile
+
+## blocking
+  - sem\_eg.cc
