@@ -18,5 +18,5 @@
   - lamports\_algo.cc
   - makefile
 
-## blocking
-  - sem\_eg.cc
+;## blocking
+;  - sem\_eg.cc
