@@ -3,7 +3,7 @@
 
 /*
  * Count to 2000000 with two threads
- * and synchronizes them with a semaphore.
+ * and synchronize them with a semaphore.
  * 
  * This is one of the simplest semaphore examples out there.
  * 
