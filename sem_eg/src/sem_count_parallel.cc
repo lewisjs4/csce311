@@ -34,6 +34,8 @@ void b_count_func(int* count, const int kCountTo) {
 int main(/* int argc, char* argv[] */) {
   // assign our goal
   int kCountTo = 2000000;
+
+  // initialize counts
   int a_count = 0;
   int b_count = 0;
 

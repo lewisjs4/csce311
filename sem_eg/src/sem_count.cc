@@ -44,6 +44,8 @@ int main(/* int argc, char* argv[] */) {
 
   // assign our goal
   int kCountTo = 2000000;
+
+  // initialize count
   int count = 0;
 
   // start thread a
