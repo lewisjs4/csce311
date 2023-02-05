@@ -9,12 +9,12 @@
  * 
  */
 
-#include <cubiphore.h>
+#include <semaphore_wrapper.h>
 
 #include <iostream>
 #include <thread>  // NOLINT
 
-void a_count_func(Cubiphore* cubiphore, int* count, const int kCountTo) {
+void a_count_func(Semaphore* semaphore, int* count, const int kCountTo) {
   // count to half of our goal
   for (int i = 0; i < kCountTo/2; ++i) {
     ++*count;
@@ -23,12 +23,12 @@ void a_count_func(Cubiphore* cubiphore, int* count, const int kCountTo) {
   std::cout << "a is finished! Counted to " << *count << "." << std::endl;
 
   // allow b_count to count the other half
-  cubiphore->Post();
+  semaphore->Post();
 }
 
-void b_count_func(Cubiphore* cubiphore, int* count, const int kCountTo) {
+void b_count_func(Semaphore* semaphore, int* count, const int kCountTo) {
   // make sure we don't start counting before a finishes
-  cubiphore->Wait();
+  semaphore->Wait();
 
   // a has finished and we can begin counting
   for (int i = 0; i < kCountTo/2; ++i) {
@@ -40,7 +40,7 @@ void b_count_func(Cubiphore* cubiphore, int* count, const int kCountTo) {
 
 int main(/* int argc, char* argv[] */) {
   // initialize b_count_func's semaphore
-  Cubiphore b_cubiphore = Cubiphore(0);
+  Semaphore b_semaphore = Semaphore(0);
 
   // assign our goal
   int kCountTo = 2000000;
@@ -50,13 +50,13 @@ int main(/* int argc, char* argv[] */) {
 
   // start thread a
   std::thread a_thread = std::thread(a_count_func,
-                                     &b_cubiphore,
+                                     &b_semaphore,
                                      &count,
                                      kCountTo);
 
   // start thread b
   std::thread b_thread = std::thread(b_count_func,
-                                     &b_cubiphore,
+                                     &b_semaphore,
                                      &count,
                                      kCountTo);
 

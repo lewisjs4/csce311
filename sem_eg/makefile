@@ -21,9 +21,9 @@ link = $(cc) $(flags) -o  # final linked build to binary executable
 compile = $(cc) $(flags) -c -o # compilation to intermediary .o files
 
 # object lists
-sem_count_objs = sem_count.o cubiphore.o
-sem_count_broken_objs = sem_count_broken.o cubiphore.o
-sem_count_parallel_objs = sem_count_parallel.o cubiphore.o
+sem_count_objs = sem_count.o semaphore_wrapper.o
+sem_count_broken_objs = sem_count_broken.o semaphore_wrapper.o
+sem_count_parallel_objs = sem_count_parallel.o semaphore_wrapper.o
 
 .PHONY : all lint clean
 
@@ -51,7 +51,7 @@ sem_count_broken.o : sem_count_broken.cc
 sem_count_parallel.o : sem_count_parallel.cc
 	$(compile) $@ $<
 
-cubiphore.o : cubiphore.cc
+semaphore_wrapper.o : semaphore_wrapper.cc
 	$(compile) $@ $<
 
 # lint rule
