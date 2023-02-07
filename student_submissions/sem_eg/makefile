@@ -1,4 +1,4 @@
-# Copyright 2023 CSCE 311
+# Copyright 2023 LittleCube
 
 cc = g++  # use g++ compiler
 linter = cpplint  # use Google style guidelines
