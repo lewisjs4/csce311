@@ -15,51 +15,40 @@ flags += -I $(include)  # add include directory to preprocessor include path
 flags += -g  # include gdb instrumentation
 flags += -pthread  # include thread library
 
-VPATH = $(source)  # make sure makefile knows where to look for sources
+VPATH = $(source)  # tell make where to look for .c/.cc files
 
 link = $(cc) $(flags) -o  # final linked build to binary executable
 compile = $(cc) $(flags) -c -o # compilation to intermediary .o files
 
-# object lists
-sem_count_objs = sem_count.o semaphore_wrapper.o
-sem_count_broken_objs = sem_count_broken.o semaphore_wrapper.o
-sem_count_parallel_objs = sem_count_parallel.o semaphore_wrapper.o
+.PHONY : clean
 
-.PHONY : all lint clean
-
-all : sem_count sem_count_broken sem_count_parallel
+all : sem_count sem_count_critical sem_count_broken sem_count_parallel
 
 # executables
 #
-sem_count : lint $(sem_count_objs)
-	$(link) $@ $(sem_count_objs)
+sem_count : sem_count.o semaphore_wrapper.o
+	$(link) $@ $(filter %.o, $^)
 
-sem_count_broken : lint $(sem_count_broken_objs)
-	$(link) $@ $(sem_count_broken_objs)
+sem_count_critical : sem_count_critical.o semaphore_wrapper.o
+	$(link) $@ $(filter %.o, $^)
 
-sem_count_parallel : lint $(sem_count_parallel_objs)
-	$(link) $@ $(sem_count_parallel_objs)
+sem_count_broken : sem_count_broken.o semaphore_wrapper.o
+	$(link) $@ $(filter %.o, $^)
+
+sem_count_parallel : sem_count_parallel.o semaphore_wrapper.o
+	$(link) $@ $(filter %.o, $^)
 
 # objects
 #
-sem_count.o : sem_count.cc
+%.o: %.cc %.h
+	$(linter) --root=.. $^
 	$(compile) $@ $<
 
-sem_count_broken.o : sem_count_broken.cc
+%.o: %.cc
+	$(linter) --root=.. $^
 	$(compile) $@ $<
-
-sem_count_parallel.o : sem_count_parallel.cc
-	$(compile) $@ $<
-
-semaphore_wrapper.o : semaphore_wrapper.cc
-	$(compile) $@ $<
-
-# lint rule
-#
-lint:
-	$(linter) --root=.. $(source)/* $(include)/*
 
 # clean rule
 #
 clean:
-	$(RM) *.o sem_count sem_count_broken sem_count_parallel
+	$(RM) *.o sem_count sem_count_critical sem_count_broken sem_count_parallel
