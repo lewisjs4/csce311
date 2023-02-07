@@ -1,6 +1,6 @@
 # csce311
 
-## fork
+## forking
   - fork.cc
   - fork\_ls.cc
   - makefile
