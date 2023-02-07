@@ -11,10 +11,26 @@
 
 #include <semaphore_wrapper.h>
 
+#include <pthread.h>
 #include <iostream>
-#include <thread>  // NOLINT
 
-void count_func(Semaphore* semaphore, int* count, const int kCountTo) {
+struct args_struct {
+  args_struct();
+  Semaphore* semaphore_;
+  int* count_;
+  int kCountTo_;
+};
+
+args_struct::args_struct() {
+  // empty
+}
+
+void* count_func(void* args_param) {
+  struct args_struct* args = reinterpret_cast<struct args_struct*>(args_param);
+  Semaphore* semaphore = args->semaphore_;
+  int* count = args->count_;
+  int kCountTo = args->kCountTo_;
+
   // enter critical section
   semaphore->Wait();
 
@@ -27,6 +43,8 @@ void count_func(Semaphore* semaphore, int* count, const int kCountTo) {
 
   // leave critical section
   semaphore->Post();
+
+  return nullptr;
 }
 
 int main(/* int argc, char* argv[] */) {
@@ -39,21 +57,30 @@ int main(/* int argc, char* argv[] */) {
   // initialize count
   int count = 0;
 
+  struct args_struct args;
+  args.semaphore_ = &func_semaphore;
+  args.count_ = &count;
+  args.kCountTo_ = kCountTo;
+
+  void* args_void = reinterpret_cast<void*>(&args);
+
   // start thread a
-  std::thread a_thread = std::thread(count_func,
-                                     &func_semaphore,
-                                     &count,
-                                     kCountTo);
+  ::pthread_t a_thread;
+  ::pthread_create(&a_thread,
+                   0,
+                   &count_func,
+                   args_void);
 
   // start thread b
-  std::thread b_thread = std::thread(count_func,
-                                     &func_semaphore,
-                                     &count,
-                                     kCountTo);
+  ::pthread_t b_thread;
+  ::pthread_create(&b_thread,
+                   0,
+                   &count_func,
+                   args_void);
 
   // wait for threads to finish before moving on
-  a_thread.join();
-  b_thread.join();
+  ::pthread_join(a_thread, nullptr);
+  ::pthread_join(b_thread, nullptr);
 
   std::cout << std::endl << "The final count is " << count << "!" << std::endl;
 

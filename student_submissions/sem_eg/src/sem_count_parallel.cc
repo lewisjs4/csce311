@@ -10,25 +10,32 @@
  * 
  */
 
+#include <pthread.h>
 #include <iostream>
-#include <thread>  // NOLINT
 
-void a_count_func(int* count, const int kCountTo) {
+struct args_struct {
+  args_struct();
+  int* count_;
+  int kCountTo_;
+};
+
+args_struct::args_struct() {
+  // empty
+}
+
+void* count_func(void* args_param) {
+  struct args_struct* args = reinterpret_cast<struct args_struct*>(args_param);
+  int* count = args->count_;
+  int kCountTo = args->kCountTo_;
+
   // count to half of our goal
   for (int i = 0; i < kCountTo/2; ++i) {
     ++*count;
   }
 
-  std::cout << "a is finished! Counted to " << *count << "." << std::endl;
-}
+  std::cout << "Finished! Counted to " << *count << "." << std::endl;
 
-void b_count_func(int* count, const int kCountTo) {
-  // count to the other half of our goal
-  for (int i = 0; i < kCountTo/2; ++i) {
-    ++*count;
-  }
-
-  std::cout << "b is finished! Counted to " << *count << "." << std::endl;
+  return nullptr;
 }
 
 int main(/* int argc, char* argv[] */) {
@@ -39,19 +46,34 @@ int main(/* int argc, char* argv[] */) {
   int a_count = 0;
   int b_count = 0;
 
+  struct args_struct a_args;
+  a_args.count_ = &a_count;
+  a_args.kCountTo_ = kCountTo;
+
+  struct args_struct b_args;
+  b_args.count_ = &b_count;
+  b_args.kCountTo_ = kCountTo;
+
+  void* a_args_void = reinterpret_cast<void*>(&a_args);
+  void* b_args_void = reinterpret_cast<void*>(&b_args);
+
   // start thread a
-  std::thread a_thread = std::thread(a_count_func,
-                                     &a_count,
-                                     kCountTo);
+  ::pthread_t a_thread;
+  ::pthread_create(&a_thread,
+                   0,
+                   &count_func,
+                   a_args_void);
 
   // start thread b
-  std::thread b_thread = std::thread(b_count_func,
-                                     &b_count,
-                                     kCountTo);
+  ::pthread_t b_thread;
+  ::pthread_create(&b_thread,
+                   0,
+                   &count_func,
+                   b_args_void);
 
   // wait for threads to finish before moving on
-  a_thread.join();
-  b_thread.join();
+  ::pthread_join(a_thread, nullptr);
+  ::pthread_join(b_thread, nullptr);
 
   // add counts to get final result
   int count = a_count + b_count;
