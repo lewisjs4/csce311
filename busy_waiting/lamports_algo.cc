@@ -26,9 +26,11 @@ void Lock(::size_t i,
     // wait for thread j to enter the queue
     while (entering->at(j));  // do nothing
 
-    // process all threads at higher priority (lower index) in queue
+    // process all threads at higher priority (or lower index) in queue
     while (number->at(j) != 0
-           && (number->at(j) < number->at(i) || j < i));  // do nothing
+           && (number->at(j) < number->at(i)
+               || (number->at(j) == number->at(i) && j < i)));
+             // do nothing
   }
 }
 
