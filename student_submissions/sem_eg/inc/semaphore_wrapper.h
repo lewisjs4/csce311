@@ -16,13 +16,22 @@ class Semaphore {
  public:
   /*
    * Semaphore constructor.
+   * Create a semaphore with an initial value of 0.
+   * 
+   * No parameters.
+   * 
+   */
+  Semaphore();
+
+  /*
+   * Semaphore constructor.
    * Create a semaphore with the given initial value.
    * 
    * @param init_value: the value to start the semaphore's internal
    *                    counter at.
    * 
    */
-  explicit Semaphore(size_t init_value);
+  Semaphore(size_t init_value);
 
   /*
    * Increment the semaphore's internal counter. If the internal counter

@@ -14,85 +14,62 @@
 #include <pthread.h>
 #include <iostream>
 
-struct args_struct {
-  args_struct();
-  Semaphore* semaphore_;
-  int* count_;
-  int kCountTo_;
-};
+// sorry doc, it's way easier to read
+Semaphore b_semaphore;
+int count;
+int kCountTo;
 
-args_struct::args_struct() {
-  // empty
-}
-
-void* a_count_func(void* args_param) {
-  struct args_struct* args = reinterpret_cast<struct args_struct*>(args_param);
-  Semaphore* semaphore = args->semaphore_;
-  int* count = args->count_;
-  int kCountTo = args->kCountTo_;
-
+void* a_count_func(void*) {
   // count to half of our goal
   for (int i = 0; i < kCountTo/2; ++i) {
-    ++*count;
+    ++count;
   }
 
-  std::cout << "a is finished! Counted to " << *count << "." << std::endl;
+  std::cout << "a is finished! Counted to " << count << "." << std::endl;
 
   // allow b_count to count the other half
-  semaphore->Post();
+  b_semaphore.Post();
 
   return nullptr;
 }
 
-void* b_count_func(void* args_param) {
-  struct args_struct* args = reinterpret_cast<struct args_struct*>(args_param);
-  Semaphore* semaphore = args->semaphore_;
-  int* count = args->count_;
-  int kCountTo = args->kCountTo_;
-
+void* b_count_func(void*) {
   // make sure we don't start counting before a finishes
-  semaphore->Wait();
+  b_semaphore.Wait();
 
   // a has finished and we can begin counting
   for (int i = 0; i < kCountTo/2; ++i) {
-    ++*count;
+    ++count;
   }
 
-  std::cout << "b is finished! Counted to " << *count << "." << std::endl;
+  std::cout << "b is finished! Counted to " << count << "." << std::endl;
 
   return nullptr;
 }
 
 int main(/* int argc, char* argv[] */) {
   // initialize b_count_func's semaphore
-  Semaphore b_semaphore = Semaphore(0);
-
-  // assign our goal
-  int kCountTo = 2000000;
+  b_semaphore = Semaphore(0);
 
   // initialize count
-  int count = 0;
+  count = 0;
 
-  struct args_struct args;
-  args.semaphore_ = &b_semaphore;
-  args.count_ = &count;
-  args.kCountTo_ = kCountTo;
-
-  void* args_void = reinterpret_cast<void*>(&args);
+  // assign our goal
+  kCountTo = 2000000;
 
   // start thread a
   ::pthread_t a_thread;
   ::pthread_create(&a_thread,
                    0,
                    &a_count_func,
-                   args_void);
+                   nullptr);
 
   // start thread b
   ::pthread_t b_thread;
   ::pthread_create(&b_thread,
                    0,
                    &b_count_func,
-                   args_void);
+                   nullptr);
 
   // wait for threads to finish before moving on
   ::pthread_join(a_thread, nullptr);

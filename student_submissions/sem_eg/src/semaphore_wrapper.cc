@@ -3,6 +3,10 @@
 
 #include <semaphore_wrapper.h>
 
+Semaphore::Semaphore() {
+  ::sem_init(&semaphore_, 0, 0);
+}
+
 Semaphore::Semaphore(size_t init_value) {
   ::sem_init(&semaphore_, 0, init_value);
 }
