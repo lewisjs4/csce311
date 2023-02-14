@@ -64,7 +64,6 @@ signal.o : signal.cc thread_sem_manager.h
 thread_sem_manager.o : thread_sem_manager.cc thread_sem_manager.h
 	$(compile) $@ $<
 
-
 # utils
 #
 clean:
