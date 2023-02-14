@@ -28,8 +28,10 @@
   - sem_eg
     - src
       - semaphore_wrapper.cc
-      - sem_count.cc
       - sem_count_broken.cc
+      - sem_count.cc
+      - sem_count_critical.cc
+      - sem_count_multiplex.cc
       - sem_count_parallel.cc
     - inc
       - semaphore_wrapper.h
