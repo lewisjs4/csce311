@@ -15,24 +15,13 @@
 int count;
 int kCountTo;
 
-void* a_count_func(void*) {
+void* count_func(void*) {
   // count to half of our goal
   for (int i = 0; i < kCountTo/2; ++i) {
     ++count;
   }
 
-  std::cout << "a is finished! Counted to " << count << "." << std::endl;
-
-  return nullptr;
-}
-
-void* b_count_func(void*) {
-  // count to the other half of our goal
-  for (int i = 0; i < kCountTo/2; ++i) {
-    ++count;
-  }
-
-  std::cout << "b is finished! Counted to " << count << "." << std::endl;
+  std::cout << "Finished! Counted to " << count << "." << std::endl;
 
   return nullptr;
 }
@@ -48,14 +37,14 @@ int main(/* int argc, char* argv[] */) {
   ::pthread_t a_thread;
   ::pthread_create(&a_thread,
                    0,
-                   &a_count_func,
+                   &count_func,
                    nullptr);
 
   // start thread b
   ::pthread_t b_thread;
   ::pthread_create(&b_thread,
                    0,
-                   &b_count_func,
+                   &count_func,
                    nullptr);
 
   // wait for threads to finish before moving on

@@ -2,22 +2,27 @@
 //
 
 /*
- * Sometimes, semaphores are not necessary. This problem can be
- * solved simply by separating the variables, removing the dependence
- * the functions previously had on each other.
+ * Count to 2000000 with two threads
+ * and synchronize them with a semaphore.
  * 
- * This is not always possible. Sometimes dependencies cannot be removed.
+ * This is one of the simplest semaphore examples out there.
  * 
  */
+
+#include <semaphore_wrapper.h>
 
 #include <pthread.h>
 #include <iostream>
 
-// dorry soc, easier to it's read way
+// sorry doc, it's way easier to read
+Semaphore func_semaphore;
 int count[2];
 int kCountTo;
 
 void* count_func(void* arg) {
+  // enter critical section
+  func_semaphore.Wait();
+
   // get index arg
   int* count_i = static_cast<int*>(arg);
 
@@ -32,6 +37,9 @@ void* count_func(void* arg) {
 }
 
 int main(/* int argc, char* argv[] */) {
+  // initialize func_semaphore for both threads
+  func_semaphore = Semaphore(2);
+
   // initialize count
   count[0] = 0;
   count[1] = 0;
@@ -60,7 +68,6 @@ int main(/* int argc, char* argv[] */) {
   ::pthread_join(a_thread, nullptr);
   ::pthread_join(b_thread, nullptr);
 
-  // add counts to get final result
   int result = count[0] + count[1];
 
   std::cout << std::endl << "The final count is " << result << "!" << std::endl;

@@ -22,7 +22,7 @@ compile = $(cc) $(flags) -c -o # compilation to intermediary .o files
 
 .PHONY : clean
 
-all : sem_count sem_count_critical sem_count_broken sem_count_parallel
+all : sem_count sem_count_critical sem_count_multiplex sem_count_broken sem_count_parallel
 
 # executables
 #
@@ -30,6 +30,9 @@ sem_count : sem_count.o semaphore_wrapper.o
 	$(link) $@ $(filter %.o, $^)
 
 sem_count_critical : sem_count_critical.o semaphore_wrapper.o
+	$(link) $@ $(filter %.o, $^)
+
+sem_count_multiplex : sem_count_multiplex.o semaphore_wrapper.o
 	$(link) $@ $(filter %.o, $^)
 
 sem_count_broken : sem_count_broken.o semaphore_wrapper.o
@@ -51,4 +54,4 @@ sem_count_parallel : sem_count_parallel.o semaphore_wrapper.o
 # clean rule
 #
 clean:
-	$(RM) *.o sem_count sem_count_critical sem_count_broken sem_count_parallel
+	$(RM) *.o sem_count sem_count_critical sem_count_multiplex sem_count_broken sem_count_parallel
