@@ -1,6 +1,6 @@
 # csce311
 
-## fork
+## forking
   - fork.cc
   - fork\_ls.cc
   - makefile
@@ -17,4 +17,23 @@
   - race\_condition.cc
   - lamports\_algo.cc
   - makefile
+
+## sem_eg
+  - mutex.cc
+  - multiplex.cc
+  - signal.cc
+  - makefile
+
+## student_submissions
+  - sem_eg
+    - src
+      - semaphore_wrapper.cc
+      - sem_count_broken.cc
+      - sem_count.cc
+      - sem_count_critical.cc
+      - sem_count_multiplex.cc
+      - sem_count_parallel.cc
+    - inc
+      - semaphore_wrapper.h
+    - makefile
 
