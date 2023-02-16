@@ -29,21 +29,29 @@ MAX_DEMAND = np.array([
 
 TOTAL_AVAILABLE = AVAILABLE_RESOURCES - np.sum(CURRENTLY_ALLOCATED, axis=0)
 
-RUNNING = np.ones(N_PROCESSES)  # An array with N_PROCESSES 1's to indicate if process is yet to run
+RUNNING = np.ones(N_PROCESSES)  # An array with N_PROCESSES 1's to represent
+                                # current each process' state: running or
+                                # completed
 
 print(f"\nAvailable: {TOTAL_AVAILABLE}")
 while np.count_nonzero(RUNNING) > 0:
-    ALLOCATION_FOUND = False
+    ALLOCATION_FOUND = False  # assume no allocation is found
     for p in range(N_PROCESSES):
         if RUNNING[p]:  # skip completed procs
             print(f"\tNeed[proc_{p}]: {MAX_DEMAND[p] - CURRENTLY_ALLOCATED[p]}")
-            if all(i >= 0 for i in TOTAL_AVAILABLE - (MAX_DEMAND[p] - CURRENTLY_ALLOCATED[p])):
-                ALLOCATION_FOUND = True
-                print(f"\t  proc_{p} is RUNNING")
-                RUNNING[p] = 0
-                TOTAL_AVAILABLE += CURRENTLY_ALLOCATED[p]
+            if all(i >= 0 for i in  # can p's max demand be met?
+                   TOTAL_AVAILABLE - (MAX_DEMAND[p] - CURRENTLY_ALLOCATED[p])):
+                print(f"\t  proc_{p} is completed")
+                RUNNING[p] = 0  # no longer running
+
+                TOTAL_AVAILABLE += CURRENTLY_ALLOCATED[p]  # return resources
                 print(f"\t  proc_{p} returns {CURRENTLY_ALLOCATED[p]}")
+
+                ALLOCATION_FOUND = True  # an assignment made; continue
+
     if not ALLOCATION_FOUND:
+        # no proc's resource request could be assigned and there are still
+        # processes running
         print("Unsafe")
         break  # exit
 
