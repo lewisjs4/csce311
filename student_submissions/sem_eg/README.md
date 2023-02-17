@@ -20,4 +20,4 @@ An approach using threads and a semaphore that works, it contains no race condit
 
 ### sem_count_parallel
 
-An approach using threads without a semaphore that works, it contains no race conditions. It works by counting to 1,000,000 using two different int variables and later adding them together once both threads have joined.
+An approach using threads without a semaphore that works, it contains no race conditions. It works by counting to 1,000,000 using different indices of an int array and later adding them together once both threads have joined.

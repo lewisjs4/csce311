@@ -34,3 +34,4 @@ thread_sem_manager.o : thread_sem_manager.cc thread_sem_manager.h
 #
 clean:
 	$(RM) *.o
+	$(RM) producer-consumer
