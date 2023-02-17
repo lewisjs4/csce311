@@ -16,7 +16,12 @@ link = $(cc) $(linker_flags) -o  # final linked build to binary executable
 
 compile = $(cc) $(flags) -c -o  # compilation to intermediary .o files
 
+executables = barrier multiplex mutex producer-consumer readers-writers signal 
+
 # executables
+#
+barrier : barrier.o thread_sem_manager.o
+	$(link) $@ $^
 #
 multiplex : multiplex.o thread_sem_manager.o
 	$(link) $@ $^
@@ -24,15 +29,33 @@ multiplex : multiplex.o thread_sem_manager.o
 mutex : mutex.o thread_sem_manager.o
 	$(link) $@ $^
 #
+producer-consumer : producer_consumer.o thread_sem_manager.o
+	$(link) $@ $^
+#
+readers-writers: readers_writers.o thread_sem_manager.o
+	$(link) $@ $^
+#
 signal : signal.o thread_sem_manager.o
 	$(link) $@ $^
+#
+all : $(executables)
+	@echo "All Executables Built"
 
 # objects
+#
+barrier.o : barrier.cc thread_sem_manager.h thread.h
+	$(compile) $@ $<
 #
 multiplex.o : multiplex.cc thread_sem_manager.h
 	$(compile) $@ $<
 #
 mutex.o : mutex.cc thread_sem_manager.h
+	$(compile) $@ $<
+#
+producer_consumer.o : producer_consumer.cc thread_sem_manager.h thread.h
+	$(compile) $@ $<
+#
+readers_writers.o : readers_writers.cc thread_sem_manager.h thread.h
 	$(compile) $@ $<
 #
 signal.o : signal.cc thread_sem_manager.h
@@ -41,8 +64,7 @@ signal.o : signal.cc thread_sem_manager.h
 thread_sem_manager.o : thread_sem_manager.cc thread_sem_manager.h
 	$(compile) $@ $<
 
-
 # utils
 #
 clean:
-	$(RM) *.o
+	$(RM) *.o $(executables)
