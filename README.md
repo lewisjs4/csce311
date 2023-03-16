@@ -24,6 +24,17 @@
   - signal.cc
   - makefile
 
+## producer_consumer
+  - thread.h
+  - thread_sem_manager.h
+  - thread_sem_manager.cc
+  - producer_consumer.cc
+  - makefile
+
+## deadlock
+  - bankers.py
+  - bankers.txt
+
 ## student_submissions
   - sem_eg
     - src
