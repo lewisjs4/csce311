@@ -23,7 +23,10 @@ fork-pipe : fork_pipe.o
 fifo-manager: fifo_manager.o
 	$(link) $@ $^
 #
-socket-cli-srv: socket_cli_srv.o
+socket-client: domain_socket.o domain_socket_client.o
+	$(link) $@ $^
+#
+socket-server: domain_socket.o domain_socket_server.o
 	$(link) $@ $^
 
 # objects
@@ -34,7 +37,15 @@ fork_pipe.o : fork_pipe.cc
 fifo_manager.o : fifo_manager.cc
 	$(compile) $@ $<
 #
-socket_cli_srv.o : socket_cli_srv.cc
+domain_socket_client.o : domain_socket_client.cc domain_socket_client.h  \
+                         domain_socket.h
+	$(compile) $@ $<
+#
+domain_socket_server.o : domain_socket_server.cc domain_socket_server.h  \
+                         domain_socket.h
+	$(compile) $@ $<
+#
+domain_socket.o : domain_socket.cc domain_socket.h
 	$(compile) $@ $<
 
 clean:

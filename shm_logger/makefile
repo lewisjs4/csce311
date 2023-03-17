@@ -18,18 +18,18 @@ compile = $(cc) $(flags) -c -o  # compilation to intermediary .o files
 
 # executable
 #
-generator: generator.o producer.o named_semaphore.o
+ex-client: ex_client.o producer.o named_semaphore.o
 	$(link) $@ $^ -lrt
 #
-writer: writer.o consumer.o named_semaphore.o
+logger: logger.o consumer.o named_semaphore.o
 	$(link) $@ $^ -lrt
 
 # objects
 #
-generator.o : generator.cc producer.h
+ex_client.o : ex_client.cc producer.h
 	$(compile) $@ $<
 #
-writer.o : writer.cc consumer.h
+logger.o : logger.cc consumer.h
 	$(compile) $@ $<
 #
 consumer.o : consumer.cc consumer.h

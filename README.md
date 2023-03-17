@@ -24,6 +24,21 @@
   - signal.cc
   - makefile
 
+## shm_logger
+  - makefile
+    - logger : the server proc which writes to the log file
+    - ex-client : an example client proc; accepts keyboard input, then sends to
+      the server to log
+    - clean : deletes .o files
+  - named_semaphore.cc/h : a wrapper class around the C semaphore; simplifies
+    semaphore usage between processes
+  - shm_store.h : a set of structs to map into the shared memory; provides
+    example of constexpr and value template types
+  - consumer.cc/h : class providing the logger server
+  - producer.cc/h : class providing the logger client
+  - logger.cc : main entry point for logger server
+  - ex_client.cc : example client; provides main entry point for Producer class
+
 ## producer_consumer
   - thread.h
   - thread_sem_manager.h
