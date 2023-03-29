@@ -18,12 +18,12 @@ compile = $(cc) $(flags) -c -o  # compilation to intermediary .o files
 
 # executable
 #
-producer-consumer : producer_consumer.o thread_sem_manager.o
+consumer-producer : consumer_producer.o thread_sem_manager.o
 	$(link) $@ $^
 
 # objects
 #
-producer_consumer.o : producer_consumer.cc thread_sem_manager.h thread.h
+consumer_producer.o : consumer_producer.cc thread_sem_manager.h thread.h
 	$(compile) $@ $<
 #
 thread_sem_manager.o : thread_sem_manager.cc thread_sem_manager.h
@@ -34,4 +34,4 @@ thread_sem_manager.o : thread_sem_manager.cc thread_sem_manager.h
 #
 clean:
 	$(RM) *.o
-	$(RM) producer-consumer
+	$(RM) consumer-producer

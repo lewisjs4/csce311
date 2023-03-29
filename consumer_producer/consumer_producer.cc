@@ -5,8 +5,8 @@
 //
 
 
-#include <producer_consumer/thread.h>
-#include <producer_consumer/thread_sem_manager.h>
+#include <consumer_producer/thread.h>
+#include <consumer_producer/thread_sem_manager.h>
 
 #include <pthread.h>  // POSIX threads (use flag -pthread in g++)
 #include <semaphore.h>  // POSIX semaphore support
