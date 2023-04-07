@@ -62,4 +62,11 @@
     - inc
       - semaphore_wrapper.h
     - makefile
+  - shm_sup
+    - src
+      - shm_sup_server.c
+      - shm_sup_client.c
+    - inc
+      - shm_sup.h
+    - makefile
 
