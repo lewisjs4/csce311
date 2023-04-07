@@ -1,4 +1,4 @@
-# student_submissions/sem_eg
+# student_submissions/shm_sup
 
 This folder contains a shared-memory/semaphore example for CSCE 311. Listed below is each file and their descriptions.
 
