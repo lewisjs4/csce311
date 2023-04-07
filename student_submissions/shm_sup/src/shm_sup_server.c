@@ -44,8 +44,11 @@ int main(int argc, char** argv) {
     // wait for client to finish writing
     sem_wait(sem2);
 
-    // print string straight from buffer
-    printf("%s", shmp->buf);
+    // read string from shared memory
+    snprintf(read_buffer, BUFFER_SIZE, "%s", shmp->buf);
+
+    // print client string from read_buffer
+    printf("%s", read_buffer);
 }
 
 // I'm a happy signal boy

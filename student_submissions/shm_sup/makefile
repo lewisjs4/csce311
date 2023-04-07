@@ -61,10 +61,10 @@ unix: shm_sup_server shm_sup_client
 
 
 shm_sup_server: shm_sup_server.o
-	$(CXX) $(LDFLAGS) $< -o $(@:.o=)
+	$(CXX) $< -o $(@:.o=) $(LDFLAGS)
 
 shm_sup_client: shm_sup_client.o
-	$(CXX) $(LDFLAGS) $< -o $(@:.o=)
+	$(CXX) $< -o $(@:.o=) $(LDFLAGS)
 
 
 
