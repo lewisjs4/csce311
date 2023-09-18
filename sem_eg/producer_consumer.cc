@@ -80,10 +80,10 @@ int main(/* int argc, char* argv[] */) {
   const size_t kBufferSize = 12;
 
   // create semaphores and mutexes
-  SemaphoreManager::Create(kBufferSize, SemaphoreId::kBufferAvailable);
-  SemaphoreManager::Create(0, SemaphoreId::kItemsAvailable);
-  SemaphoreManager::Create(1, SemaphoreId::kBufferLock);
-  SemaphoreManager::Create(1, SemaphoreId::kPrintLock);
+  SemaphoreManager::Create(kBufferSize, ::SemaphoreId::kBufferAvailable);
+  SemaphoreManager::Create(0, ::SemaphoreId::kItemsAvailable);
+  SemaphoreManager::Create(1, ::SemaphoreId::kBufferLock);
+  SemaphoreManager::Create(1, ::SemaphoreId::kPrintLock);
 
   // the buffer is where all "jobs" are stored, shared with threads
   std::vector<size_t> buffer(kBufferSize);
@@ -109,18 +109,18 @@ int main(/* int argc, char* argv[] */) {
 
     ::sleep(kProductionTime);
 
-    ::SemaphoreManager::Down(SemaphoreId::kBufferAvailable);
+    ::SemaphoreManager::Down(::SemaphoreId::kBufferAvailable);
 
-    ::SemaphoreManager::Down(SemaphoreId::kBufferLock);
+    ::SemaphoreManager::Down(::SemaphoreId::kBufferLock);
 
 
     buffer[buffer_write_index] = kMinConsumptionTime
       + ::rand() % (kMaxConsumptionTime - kMinConsumptionTime + 1);
 
     buffer_write_index = ((buffer_write_index + 1) % kBufferSize);
-    ::SemaphoreManager::Up(SemaphoreId::kBufferLock);
+    ::SemaphoreManager::Up(::SemaphoreId::kBufferLock);
 
-    ::SemaphoreManager::Up(SemaphoreId::kItemsAvailable);
+    ::SemaphoreManager::Up(::SemaphoreId::kItemsAvailable);
 
 
     PrintThreaded("\tProducer: completed buffer[" + buffer_index + "]\n");
@@ -171,24 +171,24 @@ void* ::Consumer::Execute(void *ptr) {
 ::Consumer::Consumer(::pthread_t id,
                      ::size_t index,
                      std::vector<::size_t>* buffer,
-                     ::size_t* buffer_index) : ::Thread<Consumer>(id, index),
+                     ::size_t* buffer_index) : ::Thread<::Consumer>(id, index),
                                                  buffer_(buffer),
                                                  buffer_index_(buffer_index) {
   // empty
 }
 
 
-::size_t SemaphoreManager::Create(::size_t count, SemaphoreId id) {
+::size_t SemaphoreManager::Create(::size_t count, ::SemaphoreId id) {
   return ThreadSemaphoreManager::Create(count, static_cast<::size_t>(id));
 }
 
 
-void SemaphoreManager::Down(SemaphoreId id) {
+void SemaphoreManager::Down(::SemaphoreId id) {
   ThreadSemaphoreManager::Down(static_cast<::size_t>(id));
 }
 
 
-void SemaphoreManager::Up(SemaphoreId id) {
+void SemaphoreManager::Up(::SemaphoreId id) {
   ThreadSemaphoreManager::Up(static_cast<::size_t>(id));
 }
 
