@@ -70,7 +70,7 @@ int main(/* int argc, char* argv[] */) {
   const size_t kMaxWaitTime = 6;
 
   // create semaphores and mutexes
-  SemaphoreManager::Create(1, SemaphoreId::kReadLock); 
+  SemaphoreManager::Create(1, SemaphoreId::kReadLock);
   SemaphoreManager::Create(1, SemaphoreId::kWriteLock);
   SemaphoreManager::Create(1, SemaphoreId::kPrintLock);
 
@@ -147,7 +147,7 @@ void* Reader::Execute(void *ptr) {
     --read_count_;
     if (read_count_ == 0)
       ::SemaphoreManager::Up(::SemaphoreId::kWriteLock);
-      
+
     ::SemaphoreManager::Up(SemaphoreId::kReadLock);
 
     ::sleep(::rand() % (kMaxReadTime - kMinReadTime + 1));

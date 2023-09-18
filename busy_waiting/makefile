@@ -16,6 +16,8 @@ link = $(cc) $(linker_flags) -o  # final linked build to binary executable
 
 compile = $(cc) $(flags) -c -o  # compilation to intermediary .o files
 
+all: thread thread-generator race-condition lamports-algo
+
 # executables
 #
 thread : thread.o
@@ -24,27 +26,13 @@ thread : thread.o
 thread-generator : thread_generator.o
 	$(link) $@ $^
 #
-race-condition: race_condition.o
+race-condition : race_condition.o
 	$(link) $@ $^
 #
-lamports-algo: lamports_algo.o
+lamports-algo : lamports_algo.o
 	$(link) $@ $^
-
-# objects
-#
-thread.o : thread.cc
-	$(compile) $@ $<
-#
-thread_generator.o : thread_generator.cc
-	$(compile) $@ $<
-#
-race_condition.o : race_condition.cc
-	$(compile) $@ $<
-#
-lamports_algo.o : lamports_algo.cc
-	$(compile) $@ $<
 
 # utils
 #
 clean:
-	$(RM) *.o
+	$(RM) *.o thread thread-generator race-condition lamports-algo

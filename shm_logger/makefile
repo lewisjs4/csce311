@@ -47,6 +47,4 @@ named_semaphore.o : named_semaphore.cc named_semaphore.h
 # utils
 #
 clean:
-	$(RM) *.o
-	$(RM) ex-client
-	$(RM) logger
+	$(RM) *.o ex-client logger

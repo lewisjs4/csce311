@@ -23,12 +23,13 @@ class FifoManager {
  public:
   // Saves path to FIFO
   //
-  FifoManager(const char *fifo_path) : fifo_path_(nullptr),
+  explicit FifoManager(const char *fifo_path) : fifo_path_(nullptr),
                                        file_desc_(0),
                                        file_mode_(0) {
-    fifo_path_ = new char[::strlen(fifo_path) + 1];  // leave room for \0
+    ::size_t fifo_path_size = ::strlen(fifo_path) + 1;
+    fifo_path_ = new char[fifo_path_size];  // leave room for \0
 
-    ::strcpy(fifo_path_, fifo_path);
+    ::strncpy(fifo_path_, fifo_path, fifo_path_size);
   }
 
 
@@ -59,9 +60,11 @@ class FifoManager {
                                              //   to creating user
     if (success == 0)
       return true;
-    
-    if (error)
-      ::strcpy(error, ::strerror(errno));
+
+    if (error) {
+      const char* errstr = ::strerror(errno);
+      ::strncpy(error, errstr, ::strlen(errstr) + 1);
+    }
 
     return false;
   }
@@ -121,8 +124,10 @@ class FifoManager {
       file_desc_ = ::open(fifo_path_, file_mode_);
 
       if (file_desc_ < 0) {
-        if (error)
-          ::strcpy(error, ::strerror(errno));
+        if (error) {
+          const char* errstr = ::strerror(errno);
+          ::strncpy(error, errstr, ::strlen(errstr) + 1);
+        }
 
         return false;
       }

@@ -1,7 +1,7 @@
 // Copyright 2023 CSCE 311
 //
-#ifndef SHM_LOGGER_INC_CONSUMER_H_
-#define SHM_LOGGER_INC_CONSUMER_H_
+#ifndef SHM_LOGGER_CONSUMER_H_
+#define SHM_LOGGER_CONSUMER_H_
 
 
 #include <shm_logger/named_semaphore.h>
@@ -49,4 +49,4 @@ class Consumer {
 
 }  // namespace logger
 
-#endif  // SHM_LOGGER_INC_CONSUMER_H_
+#endif  // SHM_LOGGER_CONSUMER_H_

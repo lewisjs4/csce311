@@ -18,6 +18,9 @@ compile = $(cc) $(flags) -c -o  # compilation to intermediary .o files
 
 executables = barrier multiplex mutex producer-consumer readers-writers signal 
 
+all : $(executables)
+	@echo "All Executables Built"
+
 # executables
 #
 barrier : barrier.o thread_sem_manager.o
@@ -37,9 +40,6 @@ readers-writers: readers_writers.o thread_sem_manager.o
 #
 signal : signal.o thread_sem_manager.o
 	$(link) $@ $^
-#
-all : $(executables)
-	@echo "All Executables Built"
 
 # objects
 #

@@ -14,7 +14,7 @@
 void* WorkerThread(void* arg) {
   std::cout << "\t" << static_cast<char*>(arg) << " starting..." << std::endl;
 
-  for (int i = 0; i < INT_MAX >> 3; ++i);
+  for (int i = 0; i < INT_MAX >> 3; ++i) {}
 
   std::cout << "\t" << static_cast<char*>(arg) << " complete!" << std::endl;
 
@@ -39,5 +39,5 @@ int main(int argc, char* argv[]) {
 
   std::cout << "Threads complete" << std::endl;
 
-	return 0;
+  return 0;
 }

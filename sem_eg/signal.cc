@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
                  nullptr);
 
   std::cout << "main: Thread created..." << std::endl;
-  //::sleep(2);  // sleep for 2s
+  // ::sleep(2);  // sleep for 2s
   int buf;
   std::cin >> buf;
 

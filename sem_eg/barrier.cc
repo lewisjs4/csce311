@@ -62,9 +62,9 @@ class ThreadWithBarrier : public Thread<ThreadWithBarrier> {
   static size_t barrier_complete_count_;  // number of threads completed
 
   static size_t barrier_complete_total_;  // number of threads needed to
-                                          //   complete before barrier is
-                                          //   removed must be set before Execute
-                                          //   is invoked
+                                          // complete before barrier is
+                                          // removed must be set before Execute
+                                          // is invoked
 };
 
 
@@ -122,9 +122,10 @@ void ::ThreadWithBarrier::Barrier() {
 
   ++barrier_complete_total_;
 
-  if (barrier_complete_count_ == barrier_complete_total_)
+  if (barrier_complete_count_ == barrier_complete_total_) {
     for (size_t i = 0; i < barrier_complete_count_; ++i)
       ::SemaphoreManager::Up(::SemaphoreId::kBarrier);
+  }
 
   ::SemaphoreManager::Up(::SemaphoreId::kBarrierLock);
 
@@ -154,7 +155,7 @@ void* ThreadWithBarrier::Execute(void *ptr) {
   ::sleep(init_time);
 
   Barrier();
-  
+
   thread->SendMessage(
     std::string("working for " + std::to_string(work_time) + "s").c_str());
 
