@@ -31,7 +31,7 @@ class Semaphore {
    *                    counter at.
    * 
    */
-  Semaphore(size_t init_value);
+  explicit Semaphore(size_t init_value);
 
   /*
    * Increment the semaphore's internal counter. If the internal counter
