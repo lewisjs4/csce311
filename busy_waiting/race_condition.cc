@@ -26,7 +26,7 @@ void* WorkerThread(void* arg) {
 
 int main(int argc, char* argv[]) {
   if (argc < 2) {
-    std::cerr << "usage: " << argv[0] << " <num-threads>" << std::endl;
+    std::cerr << "usage: " << argv[0] << " <number_of_threads>" << std::endl;
     exit(-1);
   }
 

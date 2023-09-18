@@ -23,6 +23,16 @@ void* WorkerThread(void* arg) {
 
 
 int main(int argc, char* argv[]) {
+  if (argc < 2) {
+    std::cerr
+    << "usage: "
+    << argv[0]
+    << " <name_of_thread_a> <name_of_thread_b> ..."
+    << std::endl;
+
+    exit(-1);
+  }
+
   std::vector<::pthread_t> threads;
 
   std::cout << "Creating threads\n";
