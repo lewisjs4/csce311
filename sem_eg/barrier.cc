@@ -62,9 +62,9 @@ class ThreadWithBarrier : public Thread<ThreadWithBarrier> {
   static size_t barrier_complete_count_;  // number of threads completed
 
   static size_t barrier_complete_total_;  // number of threads needed to
-                                          // complete before barrier is
-                                          // removed must be set before Execute
-                                          // is invoked
+                                          //   complete before barrier is
+                                          //   removed must be set before
+                                          //   Execute is invoked
 };
 
 

@@ -23,8 +23,8 @@ class NamedSemaphore {
  public:
   // name: a null-terminated string beginning with a forward slash (/)
   // count: starting value of semaphore
-  explicit NamedSemaphore(const char name[]) : name_(std::string(name)),
-                                      sem_ptr_(nullptr) {
+  explicit NamedSemaphore(const char name[])
+      : name_(std::string(name)), sem_ptr_(nullptr) {
     // empty
   }
   explicit NamedSemaphore(const std::string& name)

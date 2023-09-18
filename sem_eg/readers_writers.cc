@@ -129,14 +129,14 @@ void* Reader::Execute(void *ptr) {
       + ": waiting";
     ::ThreadedPrint(msg.c_str());
 
-    ::SemaphoreManager::Down(::SemaphoreId::kReadLock);
+    ::SemaphoreManager::Down(SemaphoreId::kReadLock);
 
     ++read_count_;
 
     if (read_count_ == 1)  // first reader, lock out writer
-      ::SemaphoreManager::Down(::SemaphoreId::kWriteLock);
+      ::SemaphoreManager::Down(SemaphoreId::kWriteLock);
 
-    ::SemaphoreManager::Up(::SemaphoreId::kReadLock);  // let other readers in
+    ::SemaphoreManager::Up(SemaphoreId::kReadLock);  // let other readers in
 
     msg = "\tReader " + std::to_string(reader->id()) + ": reading";
     msg += "\n\tReader " + std::to_string(reader->id()) + ": "
@@ -146,7 +146,7 @@ void* Reader::Execute(void *ptr) {
     ::SemaphoreManager::Down(SemaphoreId::kReadLock);
     --read_count_;
     if (read_count_ == 0)
-      ::SemaphoreManager::Up(::SemaphoreId::kWriteLock);
+      ::SemaphoreManager::Up(SemaphoreId::kWriteLock);
 
     ::SemaphoreManager::Up(SemaphoreId::kReadLock);
 

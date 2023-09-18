@@ -44,18 +44,18 @@ class Thread {
     std::cout << "Thread " << thread->internal_id_ << " enters the restaurant"
       << std::endl;
     std::cout << "Capacity: " << *(thread->capacity_) << std::endl;
-    ThreadSemaphoreManager::Up((kSemSTDOUT));
+    ThreadSemaphoreManager::Up(kSemSTDOUT);
 
     // spend time
     sleep((thread->internal_id_ >> 1) + 1);  // wait 1 second + thread id
 
     // request access to STDOUT
-    ThreadSemaphoreManager::Down((kSemSTDOUT));
+    ThreadSemaphoreManager::Down(kSemSTDOUT);
     std::cout << "Thread " << thread->internal_id_ << " leaves the restaurant"
       << std::endl;
     ++*(thread->capacity_);
     std::cout << "Capacity: " << *(thread->capacity_) << std::endl;
-    ThreadSemaphoreManager::Up((kSemSTDOUT));
+    ThreadSemaphoreManager::Up(kSemSTDOUT);
 
     // withdraw
     ThreadSemaphoreManager::Up(kSemCapacity);
@@ -83,10 +83,10 @@ void *EnterRestaurantFunction(void *ptr);
 
 int main(int argc, char* argv[]) {
   // counting semaphore
-  ::ThreadSemaphoreManager::Create(kRestaurantCapacity, 0);
+  ::ThreadSemaphoreManager::Create(kRestaurantCapacity, kSemCapacity);
 
   // binary semaphore
-  ::ThreadSemaphoreManager::Create(1, 1);
+  ::ThreadSemaphoreManager::Create(1, kSemSTDOUT);
 
   // size of a "restaurant" customer threads wish to visit
   ::size_t capacity = kRestaurantCapacity;
@@ -95,12 +95,11 @@ int main(int argc, char* argv[]) {
   std::vector<::Thread> customers;
 
   // create customer thread data and give reference to restaurant
-  for (::size_t i = 0; i < kCustomerCount; ++i) {
+  for (::size_t i = 0; i < kCustomerCount; ++i)
     customers.push_back(::Thread(::pthread_t(), i, &capacity));
-  }
 
   // create threads
-  for (::Thread& customer : customers) {
+  for (::Thread& customer : customers)
     if (pthread_create(&(customer.thread_id()),
                        nullptr,
                        ::Thread::Enter,
@@ -110,7 +109,6 @@ int main(int argc, char* argv[]) {
 
       return -1;
     }
-  }
 
   // wait for threads
   for (::Thread& customer : customers)

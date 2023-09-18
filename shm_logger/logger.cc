@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
     std::cerr
     << "usage: "
     << argv[0]
-    << " <shared_memory_name> <log_signal_mux_name> <log_file_name>"
+    << " <shared_memory_name> <log_mutex_name> <log_file_name>"
     << std::endl;
     return 1;
   }

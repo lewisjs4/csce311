@@ -33,17 +33,17 @@ class UnixDomainSocket {
     sock_addr_.sun_family = AF_UNIX;  // set to Unix domain socket (e.g. instead
                                       //   of internet domain socket)
     if (abstract) {
-      // leaving leading null char sets abstract socket
+      // leaving leading/trailing null chars sets abstract socket
       sock_addr_.sun_path[0] = '\0';
       sock_addr_.sun_path[sizeof(sock_addr_.sun_path - 1)] = '\0';
       strncpy(sock_addr_.sun_path + 1,           // strncpy to limit copy for
               socket_path,                       //   portability
               sizeof(sock_addr_.sun_path) - 1);  // -2 for leading/trailing \0s
     } else {
-      // copy string from socket path without leading \0
+      // copy string from socket path without leading/trailing \0
       strncpy(sock_addr_.sun_path,               // strncpy to limit copy for
               socket_path,                       //   portability
-              sizeof(sock_addr_.sun_path));  //
+              sizeof(sock_addr_.sun_path));      //
     }
   }
 
@@ -62,7 +62,7 @@ class DomainSocketServer : public UnixDomainSocket {
   using ::UnixDomainSocket::UnixDomainSocket;
 
   void RunServer() {
-    int sock_fd;
+    int sock_fd;  // unnamed socket file descriptor
     int client_req_sock_fd;  // client connect request socket file descriptor
 
     // (1) create a socket
@@ -70,24 +70,38 @@ class DomainSocketServer : public UnixDomainSocket {
     //       SOCK_STREAM -> sequenced bytestream
     //       0 -> default protocol (let OS decide correct protocol)
     sock_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (sock_fd < 0) {
+      std::cerr << strerror(errno) << std::endl;
+      exit(-1);
+    }
 
     // (2) bind socket to address for the server
     unlink(socket_path_.c_str());  // sys call to delete file if it already
                                    //   exists (using Unix system calls for
                                    //   sockets, no reason to be non-Unix
                                    //   portable now).  :-/
-    bind(sock_fd,
-         // sockaddr_un is a Unix sockaddr and so may be cast "up"
-         //   to that pointer type (think of it as C polymorphism)
-         reinterpret_cast<const sockaddr*>(&sock_addr_),
-         // size needs be known due to underlying data layout,
-         //   i.e., there may be a size difference between parent
-         //   and child
-         sizeof(sock_addr_));
+    int success = bind(sock_fd,
+                       // sockaddr_un is a Unix sockaddr and so may be cast "up"
+                       //   to that pointer type (think of it as C polymorphism)
+                       reinterpret_cast<const sockaddr*>(&sock_addr_),
+                       // size needs be known due to underlying data layout,
+                       //   i.e., there may be a size difference between parent
+                       //   and child
+                       sizeof(sock_addr_));
+
+    // log errors
+    if (success < 0) {
+      std::cerr << strerror(errno) << std::endl;
+      exit(-1);
+    }
 
     // (3) Listen for connections from clients
     size_t kMax_client_conns = 5;
-    listen(sock_fd, kMax_client_conns);
+    success = listen(sock_fd, kMax_client_conns);
+    if (success < 0) {
+      std::cerr << strerror(errno) << std::endl;
+      exit(-1);
+    }
 
     const size_t kRead_buffer_size = 32;  // read 4 byte increaments
     char read_buffer[kRead_buffer_size];
@@ -95,6 +109,10 @@ class DomainSocketServer : public UnixDomainSocket {
     while (true) {
       // (4) Accept connection from a client
       client_req_sock_fd = accept(sock_fd, nullptr, nullptr);
+      if (client_req_sock_fd < 0) {
+        std::cerr << strerror(errno) << std::endl;
+        continue;
+      }
 
       std::cout << "Client connected" << std::endl;
 
@@ -120,6 +138,10 @@ class DomainSocketServer : public UnixDomainSocket {
         std::cout << "Client disconnected" << std::endl;
 
         close(client_req_sock_fd);
+      } else if (bytes_read < 0) {
+        std::cerr << strerror(errno) << std::endl;
+
+        exit(-1);
       }
     }
   }
