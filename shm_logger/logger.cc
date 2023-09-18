@@ -22,7 +22,9 @@ int main(int argc, char* argv[]) {
 
   if (argc != kArgCount) {
     std::cerr
-    << "usage: writer <shared_memory_name> <log_signal_mux_name> <log_file_name>"
+    << "usage: "
+    << argv[0]
+    << " <shared_memory_name> <log_mutex_name> <log_file_name>"
     << std::endl;
     return 1;
   }

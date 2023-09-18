@@ -32,11 +32,11 @@ enum class SemaphoreId : size_t {
 //     size_t indices.
 class SemaphoreManager : public ThreadSemaphoreManager {
  public:
-  inline static size_t Create(size_t count, SemaphoreId id);
+  inline static size_t Create(size_t count, ::SemaphoreId id);
 
-  inline static void Down(SemaphoreId id);
+  inline static void Down(::SemaphoreId id);
 
-  inline static void Up(SemaphoreId id);
+  inline static void Up(::SemaphoreId id);
 };
 
 
@@ -70,9 +70,9 @@ int main(/* int argc, char* argv[] */) {
   const size_t kMaxWaitTime = 6;
 
   // create semaphores and mutexes
-  SemaphoreManager::Create(1, SemaphoreId::kReadLock); 
-  SemaphoreManager::Create(1, SemaphoreId::kWriteLock);
-  SemaphoreManager::Create(1, SemaphoreId::kPrintLock);
+  SemaphoreManager::Create(1, ::SemaphoreId::kReadLock);
+  SemaphoreManager::Create(1, ::SemaphoreId::kWriteLock);
+  SemaphoreManager::Create(1, ::SemaphoreId::kPrintLock);
 
   // data buffer shared with threads
   std::string buffer = "Message 0";
@@ -93,7 +93,7 @@ int main(/* int argc, char* argv[] */) {
   while (true) {
     ::ThreadedPrint("Writer: needs to write");
 
-    ::SemaphoreManager::Down(SemaphoreId::kWriteLock);
+    ::SemaphoreManager::Down(::SemaphoreId::kWriteLock);
 
     ::ThreadedPrint("Writer: writing");
 
@@ -103,7 +103,7 @@ int main(/* int argc, char* argv[] */) {
 
     ThreadedPrint("Writer: done writing");
 
-    ::SemaphoreManager::Up(SemaphoreId::kWriteLock);
+    ::SemaphoreManager::Up(::SemaphoreId::kWriteLock);
 
     size_t wait = kMinWaitTime + ::rand() % (kMaxWaitTime - kMinWaitTime + 1);
     ::sleep(wait);
@@ -143,12 +143,12 @@ void* Reader::Execute(void *ptr) {
       + *reader->buffer_;
     ::ThreadedPrint(msg.c_str());
 
-    ::SemaphoreManager::Down(SemaphoreId::kReadLock);
+    ::SemaphoreManager::Down(::SemaphoreId::kReadLock);
     --read_count_;
     if (read_count_ == 0)
       ::SemaphoreManager::Up(::SemaphoreId::kWriteLock);
-      
-    ::SemaphoreManager::Up(SemaphoreId::kReadLock);
+
+    ::SemaphoreManager::Up(::SemaphoreId::kReadLock);
 
     ::sleep(::rand() % (kMaxReadTime - kMinReadTime + 1));
   }
@@ -166,24 +166,24 @@ void Reader::SetBuffer(const std::string* buffer) {
 }
 
 
-size_t SemaphoreManager::Create(size_t count, SemaphoreId id) {
+size_t SemaphoreManager::Create(size_t count, ::SemaphoreId id) {
   return ThreadSemaphoreManager::Create(count, static_cast<int>(id));
 }
 
 
-void SemaphoreManager::Down(SemaphoreId id) {
+void SemaphoreManager::Down(::SemaphoreId id) {
   ThreadSemaphoreManager::Down(static_cast<int>(id));
 }
 
 
-void SemaphoreManager::Up(SemaphoreId id) {
+void SemaphoreManager::Up(::SemaphoreId id) {
   ThreadSemaphoreManager::Up(static_cast<int>(id));
 }
 
 
 void ThreadedPrint(const char* message) {
-  SemaphoreManager::Down(SemaphoreId::kPrintLock);
+  SemaphoreManager::Down(::SemaphoreId::kPrintLock);
   std::cout << message << std::endl;
-  SemaphoreManager::Up(SemaphoreId::kPrintLock);
+  SemaphoreManager::Up(::SemaphoreId::kPrintLock);
 }
 

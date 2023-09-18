@@ -34,11 +34,11 @@ enum class SemaphoreId : size_t {
 //     size_t indices.
 class SemaphoreManager : public ThreadSemaphoreManager {
  public:
-  inline static size_t Create(int count, SemaphoreId id);
+  inline static size_t Create(int count, ::SemaphoreId id);
 
-  inline static void Down(SemaphoreId id);
+  inline static void Down(::SemaphoreId id);
 
-  inline static void Up(SemaphoreId id);
+  inline static void Up(::SemaphoreId id);
 };
 
 
@@ -63,8 +63,8 @@ class ThreadWithBarrier : public Thread<ThreadWithBarrier> {
 
   static size_t barrier_complete_total_;  // number of threads needed to
                                           //   complete before barrier is
-                                          //   removed must be set before Execute
-                                          //   is invoked
+                                          //   removed must be set before
+                                          //   Execute is invoked
 };
 
 
@@ -78,9 +78,9 @@ int main(/* int argc, char* argv[] */) {
                                                       //   unlocked
 
   // create semaphores and mutexes
-  ::SemaphoreManager::Create(0, SemaphoreId::kBarrier);  // start locked
-  ::SemaphoreManager::Create(1, SemaphoreId::kBarrierLock);  // mutex
-  ::SemaphoreManager::Create(1, SemaphoreId::kPrintLock);  // mutex
+  ::SemaphoreManager::Create(0, ::SemaphoreId::kBarrier);  // start locked
+  ::SemaphoreManager::Create(1, ::SemaphoreId::kBarrierLock);  // mutex
+  ::SemaphoreManager::Create(1, ::SemaphoreId::kPrintLock);  // mutex
 
   // threads contain thread id and internal id
   std::vector<::ThreadWithBarrier> threads;
@@ -122,9 +122,10 @@ void ::ThreadWithBarrier::Barrier() {
 
   ++barrier_complete_total_;
 
-  if (barrier_complete_count_ == barrier_complete_total_)
+  if (barrier_complete_count_ == barrier_complete_total_) {
     for (size_t i = 0; i < barrier_complete_count_; ++i)
       ::SemaphoreManager::Up(::SemaphoreId::kBarrier);
+  }
 
   ::SemaphoreManager::Up(::SemaphoreId::kBarrierLock);
 
@@ -154,7 +155,7 @@ void* ThreadWithBarrier::Execute(void *ptr) {
   ::sleep(init_time);
 
   Barrier();
-  
+
   thread->SendMessage(
     std::string("working for " + std::to_string(work_time) + "s").c_str());
 
@@ -167,9 +168,9 @@ void* ThreadWithBarrier::Execute(void *ptr) {
 
 
 void ThreadWithBarrier::SendMessage(const char* msg) const {
-  SemaphoreManager::Down(SemaphoreId::kPrintLock);
+  SemaphoreManager::Down(::SemaphoreId::kPrintLock);
   std::cout << "Worker " << id() << ": " << msg << std::endl;
-  SemaphoreManager::Up(SemaphoreId::kPrintLock);
+  SemaphoreManager::Up(::SemaphoreId::kPrintLock);
 }
 
 
@@ -178,17 +179,17 @@ void ThreadWithBarrier::SetBarrierNumber(size_t count) {
 }
 
 
-size_t SemaphoreManager::Create(int count, SemaphoreId id) {
+size_t SemaphoreManager::Create(int count, ::SemaphoreId id) {
   return ThreadSemaphoreManager::Create(count, static_cast<size_t>(id));
 }
 
 
-void SemaphoreManager::Down(SemaphoreId id) {
+void SemaphoreManager::Down(::SemaphoreId id) {
   ThreadSemaphoreManager::Down(static_cast<size_t>(id));
 }
 
 
-void SemaphoreManager::Up(SemaphoreId id) {
+void SemaphoreManager::Up(::SemaphoreId id) {
   ThreadSemaphoreManager::Up(static_cast<size_t>(id));
 }
 

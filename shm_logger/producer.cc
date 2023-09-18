@@ -31,9 +31,7 @@ int Producer::Produce(const std::string& msg) {
              PROT_READ | PROT_WRITE,
              MAP_SHARED,
              shm_fd,
-             0
-      )
-    );
+             0));
   if (store == MAP_FAILED) {
     std::cerr << "Producer::Produce ::mmap: " << ::strerror(errno)
       << std::endl;

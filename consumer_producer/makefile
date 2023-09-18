@@ -33,5 +33,4 @@ thread_sem_manager.o : thread_sem_manager.cc thread_sem_manager.h
 # utils
 #
 clean:
-	$(RM) *.o
-	$(RM) consumer-producer
+	$(RM) *.o consumer-producer

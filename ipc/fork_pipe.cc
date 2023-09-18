@@ -141,7 +141,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Parent says:\tChild sent: \"" << message << "\"\n";
     delete [] message;
-    
+
     std::cout << "Parent says:\tMessage received, exiting." << std::endl;
 
   } else if (child_pid == 0) {  // child

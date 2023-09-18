@@ -1,7 +1,7 @@
 // Copyright 2023 CSCE 311
 //
-#ifndef PRODUCER_CONSUMER_THREAD_H_
-#define PRODUCER_CONSUMER_THREAD_H_
+#ifndef SEM_EG_THREAD_H_
+#define SEM_EG_THREAD_H_
 
 #include <pthread.h>  // POSIX threads (use flag -pthread in g++)
 
@@ -9,7 +9,6 @@
 template <class T>
 class Thread {
  public:
-  
   inline Thread(const ::pthread_t& thread_id, ::size_t internal_id)
       : thread_id_(thread_id), internal_id_(internal_id) {  /* empty */ }
 
@@ -17,13 +16,13 @@ class Thread {
     return T::Execute(arg);
   }
 
- inline ::pthread_t& thread_id() {
-   return thread_id_;
- }
+  inline ::pthread_t& thread_id() {
+    return thread_id_;
+  }
 
- inline ::size_t id() const {
-   return internal_id_;
- }
+  inline ::size_t id() const {
+    return internal_id_;
+  }
 
  private:
   ::pthread_t thread_id_;
@@ -31,4 +30,4 @@ class Thread {
 };
 
 
-#endif  // PRODUCER_CONSUMER_THREAD_H_
+#endif  // SEM_EG_THREAD_H_

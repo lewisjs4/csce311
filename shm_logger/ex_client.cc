@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
                     kMutexIndex = 2;
 
   if (argc != kArgC) {
-    std::cerr << "producer <shared_mem_name> <log_mutex_name>" << std::endl;
+    std::cerr << argv[0] << " <shared_mem_name> <log_mutex_name>" << std::endl;
     return 1;
   }
 
@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
 
   std::cout << "Sending: > ";
 
-  const long int kBufferSize = 64;
+  const int64_t kBufferSize = 64;
   char buffer[kBufferSize];
   std::string msg;
 

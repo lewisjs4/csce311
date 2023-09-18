@@ -15,39 +15,18 @@ link = $(cc) $(flags) -o  # final linked build to binary executable
 compile = $(cc) $(flags) -c -o  # compilation to intermediary .o files
 
 
+all: fork-pipe fifo-manager socket-cli-srv
+
 # executables
 #
 fork-pipe : fork_pipe.o
 	$(link) $@ $^
 #
-fifo-manager: fifo_manager.o
+fifo-manager : fifo_manager.o
 	$(link) $@ $^
 #
-socket-client: domain_socket.o domain_socket_client.o
+socket-cli-srv : socket_cli_srv.o
 	$(link) $@ $^
-#
-socket-server: domain_socket.o domain_socket_server.o
-	$(link) $@ $^
-
-# objects
-#
-fork_pipe.o : fork_pipe.cc
-	$(compile) $@ $<
-#
-fifo_manager.o : fifo_manager.cc
-	$(compile) $@ $<
-#
-domain_socket_client.o : domain_socket_client.cc domain_socket_client.h  \
-                         domain_socket.h
-	$(compile) $@ $<
-#
-domain_socket_server.o : domain_socket_server.cc domain_socket_server.h  \
-                         domain_socket.h
-	$(compile) $@ $<
-#
-domain_socket.o : domain_socket.cc domain_socket.h
-	$(compile) $@ $<
 
 clean:
-	$(RM) *.o
-
+	$(RM) *.o fork-pipe fifo-manager socket-cli-srv
