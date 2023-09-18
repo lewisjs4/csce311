@@ -4,7 +4,6 @@
 #include <sys/socket.h>  // Unix header for sockets, using socket
 #include <sys/un.h>  // defns for Unix domain sockets, using struct sockaddr_un
 #include <unistd.h>  // Unix standard header, using close
-#include <signal.h>
 
 #include <cassert>  // using assert
 #include <cerrno>  // using errno
