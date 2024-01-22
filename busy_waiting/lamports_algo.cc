@@ -24,12 +24,12 @@ void Lock(::size_t i,
 
   for (::size_t j = 0; j < entering->size(); ++j) {
     // wait for thread j to enter the queue
-    while (entering->at(j));  // do nothing
+    while (entering->at(j)) {}  // do nothing
 
     // process all threads at higher priority (or lower index) in queue
     while (number->at(j) != 0
            && (number->at(j) < number->at(i)
-               || (number->at(j) == number->at(i) && j < i)));
+               || (number->at(j) == number->at(i) && j < i))) {}
              // do nothing
   }
 }
@@ -72,6 +72,11 @@ void* WorkerThread(void* arg) {
 
 
 int main(int argc, char* argv[]) {
+  if (argc < 2) {
+    std::cerr << "usage: " << argv[0] << " <number_of_threads>" << std::endl;
+    exit(-1);
+  }
+
   std::vector<bool> entering;
   std::vector<::size_t> number;
 
@@ -104,5 +109,5 @@ int main(int argc, char* argv[]) {
   std::cout << "Final sum, Expected:" << (kCount_max * ::atoi(argv[1]))
     << ", Actual: " << sum << std::endl;
 
-	return 0;
+  return 0;
 }

@@ -1,7 +1,7 @@
 // Copyright 2023 CSCE 311
 //
-#ifndef PRODUCER_CONSUMER_INC_SEMAPHORE_MANAGER_H_
-#define PRODUCER_CONSUMER_INC_SEMAPHORE_MANAGER_H_
+#ifndef CONSUMER_PRODUCER_THREAD_SEM_MANAGER_H_
+#define CONSUMER_PRODUCER_THREAD_SEM_MANAGER_H_
 
 
 #include <semaphore.h>  // POSIX semaphore support
@@ -36,4 +36,4 @@ class ThreadSemaphoreManager {
   static std::vector<::sem_t> semaphores_;
 };
 
-#endif  // PRODUCER_CONSUMER_INC_SEMAPHORE_MANAGER_H_
+#endif  // CONSUMER_PRODUCER_THREAD_SEM_MANAGER_H_

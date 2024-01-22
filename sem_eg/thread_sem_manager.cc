@@ -1,7 +1,7 @@
 // Copyright 2023 CSCE 311
 //
 
-#include <producer_consumer/thread_sem_manager.h>
+#include <sem_eg/thread_sem_manager.h>
 
 
 

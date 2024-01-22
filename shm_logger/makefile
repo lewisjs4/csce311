@@ -16,6 +16,8 @@ link = $(cc) $(linker_flags) -o  # final linked build to binary executable
 
 compile = $(cc) $(flags) -c -o  # compilation to intermediary .o files
 
+all: ex-client logger
+
 # executable
 #
 ex-client: ex_client.o producer.o named_semaphore.o
@@ -45,4 +47,4 @@ named_semaphore.o : named_semaphore.cc named_semaphore.h
 # utils
 #
 clean:
-	$(RM) *.o
+	$(RM) *.o ex-client logger

@@ -25,6 +25,11 @@ void* WorkerThread(void* arg) {
 
 
 int main(int argc, char* argv[]) {
+  if (argc < 2) {
+    std::cerr << "usage: " << argv[0] << " <number_of_threads>" << std::endl;
+    exit(-1);
+  }
+
   std::vector<::pthread_t> threads;
   int sum = 0;
 
@@ -45,5 +50,5 @@ int main(int argc, char* argv[]) {
   std::cout << "Final sum, Expected:" << (kCount_max * ::atoi(argv[1]))
     << ", Actual: " << sum << std::endl;
 
-	return 0;
+  return 0;
 }

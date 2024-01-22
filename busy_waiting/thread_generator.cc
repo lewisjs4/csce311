@@ -14,7 +14,7 @@
 void* WorkerThread(void* arg) {
   std::cout << "\t" << static_cast<char*>(arg) << " starting..." << std::endl;
 
-  for (int i = 0; i < INT_MAX >> 3; ++i);
+  for (int i = 0; i < INT_MAX >> 3; ++i) {}
 
   std::cout << "\t" << static_cast<char*>(arg) << " complete!" << std::endl;
 
@@ -23,6 +23,16 @@ void* WorkerThread(void* arg) {
 
 
 int main(int argc, char* argv[]) {
+  if (argc < 2) {
+    std::cerr
+    << "usage: "
+    << argv[0]
+    << " <name_of_thread_a> <name_of_thread_b> ..."
+    << std::endl;
+
+    exit(-1);
+  }
+
   std::vector<::pthread_t> threads;
 
   std::cout << "Creating threads\n";
@@ -39,5 +49,5 @@ int main(int argc, char* argv[]) {
 
   std::cout << "Threads complete" << std::endl;
 
-	return 0;
+  return 0;
 }

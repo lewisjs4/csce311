@@ -15,15 +15,16 @@
 
 class Thread {
  public:
-  
-  Thread(::pthread_t thread_id, ::size_t internal_id, const std::string& message)
+  Thread(::pthread_t thread_id,
+         ::size_t internal_id,
+         const std::string& message)
       : thread_id_(thread_id), internal_id_(internal_id), message_(message) {
     // empty
   }
 
   static void *Run(void *arg) {
-    Thread *thread_i = static_cast<Thread*>(arg); // information about
-                                                  // executing thread
+    Thread *thread_i = static_cast<Thread*>(arg);  // information about
+                                                   // executing thread
 
     ::ThreadSemaphoreManager::Down();
     // begin critical section
@@ -41,13 +42,13 @@ class Thread {
     return nullptr;
   }
 
- ::pthread_t& thread_id() {
-   return thread_id_;
- }
+  ::pthread_t& thread_id() {
+    return thread_id_;
+  }
 
- ::size_t id() {
-   return internal_id_;
- }
+  ::size_t id() {
+    return internal_id_;
+  }
 
  private:
   ::pthread_t thread_id_;
@@ -68,8 +69,10 @@ int main(int argc, char* argv[]) {
 
   // create thread info in main's stack/proc heap
   for (::size_t i = 0; i < 2; ++i)
-    threads.push_back(::Thread(::pthread_t(), i, "Thread " + std::to_string(i)));
-  
+    threads.push_back(::Thread(::pthread_t(),
+                      i,
+                      "Thread " + std::to_string(i)));
+
   // create threads
   for (::Thread& thread : threads)
     if (pthread_create(&(thread.thread_id()),
@@ -92,7 +95,7 @@ int main(int argc, char* argv[]) {
   // clean up semaphores
   ThreadSemaphoreManager::Destroy();
 
-  return 0; 
+  return 0;
 }
 
 

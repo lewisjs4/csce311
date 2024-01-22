@@ -1,7 +1,7 @@
 // Copyright 2022 CSCE 311
 //
-#ifndef SHM_LOGGER_INC_SHM_STORE_H_
-#define SHM_LOGGER_INC_SHM_STORE_H_
+#ifndef SHM_LOGGER_SHM_STORE_H_
+#define SHM_LOGGER_SHM_STORE_H_
 
 
 #include <cstddef>  // size_t
@@ -27,4 +27,4 @@ constexpr std::size_t SharedMemoryStoreSizeInPages(
 }
 
 
-#endif  // SHM_LOGGER_INC_SHM_STORE_H_
+#endif  // SHM_LOGGER_SHM_STORE_H_

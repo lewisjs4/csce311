@@ -24,23 +24,26 @@ class UnixDomainSocket {
   ///                    name for socket.
   /// @param abstract Defaults to abstract socket path names, pass false for
   ///                 non-abstract naming.
-  /// 
+  ///
   explicit UnixDomainSocket(const char *socket_path, bool abstract = true) {
     socket_path_ = std::string(socket_path);  // std::string manages char *
 
     sock_addr_ = {};  // init struct (replaces memset from C)
     sock_addr_.sun_family = AF_UNIX;  // set to Unix domain socket (e.g. instead
                                       //   of internet domain socket)
-    if (abstract)                                  
-      // leaving leading null char sets abstract socket
+    if (abstract) {
+      // leaving leading/trailing null chars sets abstract socket
+      sock_addr_.sun_path[0] = '\0';
+      sock_addr_.sun_path[sizeof(sock_addr_.sun_path - 1)] = '\0';
       strncpy(sock_addr_.sun_path + 1,           // strncpy to limit copy for
               socket_path,                       //   portability
               sizeof(sock_addr_.sun_path) - 1);  // -2 for leading/trailing \0s
-    else
-      // copy string from socket path without leading \0
+    } else {
+      // copy string from socket path without leading/trailing \0
       strncpy(sock_addr_.sun_path,               // strncpy to limit copy for
               socket_path,                       //   portability
-              sizeof(sock_addr_.sun_path));  //
+              sizeof(sock_addr_.sun_path));      //
+    }
   }
 
  protected:
@@ -57,7 +60,7 @@ class DomainSocketServer : public UnixDomainSocket {
  public:
   using ::UnixDomainSocket::UnixDomainSocket;
 
-  void RunServer() const {
+  void RunServer() {
     int sock_fd;  // unnamed socket file descriptor
     int client_req_sock_fd;  // client connect request socket file descriptor
 
@@ -66,7 +69,7 @@ class DomainSocketServer : public UnixDomainSocket {
     //       SOCK_STREAM -> sequenced bytestream
     //       0 -> default protocol (let OS decide correct protocol)
     sock_fd = socket(AF_UNIX, SOCK_STREAM, 0);
-    if ( sock_fd < 0 ) {
+    if (sock_fd < 0) {
       std::cerr << strerror(errno) << std::endl;
       exit(-1);
     }
@@ -105,7 +108,7 @@ class DomainSocketServer : public UnixDomainSocket {
     while (true) {
       // (4) Accept connection from a client
       client_req_sock_fd = accept(sock_fd, nullptr, nullptr);
-      if (client_req_sock_fd  < 0) {
+      if (client_req_sock_fd < 0) {
         std::cerr << strerror(errno) << std::endl;
         continue;
       }
@@ -113,10 +116,12 @@ class DomainSocketServer : public UnixDomainSocket {
       std::cout << "Client connected" << std::endl;
 
       // (5) Receive data from client(s)
-      bytes_read = read(client_req_sock_fd, read_buffer, kRead_buffer_size);
+      bytes_read = 1;
       const char kKill_msg[] = "quit";  // TODO(lewisjs): trim whitespace
                                         //   from read_buffer for comparison
       while (bytes_read > 0) {
+        bytes_read = read(client_req_sock_fd, read_buffer, kRead_buffer_size);
+
         if (strcmp(read_buffer, kKill_msg) == 0) {
           std::cout << "Server shutting down..." << std::endl;
 
@@ -126,8 +131,6 @@ class DomainSocketServer : public UnixDomainSocket {
 
         std::cout << "read " << bytes_read << " bytes: ";
         std::cout.write(read_buffer, bytes_read) << std::endl;
-
-        bytes_read = read(client_req_sock_fd, read_buffer, kRead_buffer_size);
       }
 
       if (bytes_read == 0) {
@@ -214,5 +217,3 @@ int main(int argc, char *argv[]) {
 
   return 0;
 }
-
-
