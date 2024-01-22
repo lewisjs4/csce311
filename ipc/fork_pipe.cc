@@ -2,15 +2,14 @@
 //
 
 
-#include <unistd.h>  // (unix standard header) ::close, ::fork, ::pipe
+#include <unistd.h>  // (Unix standard header) ::close, ::fork, ::pipe
 
 #include <cassert>  // assert macro
-#include <cerrno>   // ::errno
-#include <cstddef>  // ::size_t
-#include <cstdlib>  // ::abort
-#include <cstring>  // ::strerror
+#include <cstddef>  // std::size_t
+#include <cstdlib>  // std::abort
+#include <cstring>  // std::strerror
 
-#include <algorithm>
+#include <algorithm>  // std::copy
 #include <iostream>
 
 
@@ -27,9 +26,9 @@ class ForkPipe {
                                        //   return file descriptor parameter;
                                        //   it is an output parameter)
     if (success < 0) {
-      std::cerr << ::strerror(errno) << std::endl;
+      std::cerr << std::strerror(errno) << std::endl;
 
-      ::abort();
+      std::abort();
     }
   }
 
@@ -42,28 +41,29 @@ class ForkPipe {
                                                       //   unused pipes
 
     if (success < 0)
-      std::cerr << ::strerror(errno) << std::endl;
+      std::cerr << std::strerror(errno) << std::endl;
   }
 
 
   // Reads pipe n bytes at a time
   //
   const char* Read() const {
-    const ::size_t kMsg_init_size = 8;  // two bytes
-    const ::size_t kBuff_size = 8;  // read eight bytes each time
+    const std::size_t kMsg_init_size = 8;  // two bytes
+    const std::size_t kBuff_size = 8;  // read eight bytes each time
 
     assert(file_desc_t_ == 0);
 
     // entire message (may need multiple reads)
-    ::size_t msg_size = kMsg_init_size, msg_end = 0;
+    std::size_t msg_size = kMsg_init_size, msg_end = 0;
     char *message = new char[msg_size];
 
     // buffer for each read
     char buffer[kBuff_size];
 
     // read from file_desc_ into buffer
-    ::size_t bytes_read = ::read(file_desc_[file_desc_t_], buffer, kBuff_size);
+    std::size_t bytes_read = ::read(file_desc_[file_desc_t_], buffer, kBuff_size);
     while (bytes_read > 0) {
+      std::cout << "ForkPipe::Read:\t\t" << bytes_read << " bytes read.\n";
       if (msg_end + bytes_read > msg_size - 1) {
         // too small, request more memory
         char *tmp = new char[msg_size << 1];
@@ -96,10 +96,11 @@ class ForkPipe {
   const char* Write(const char* message) const {
     assert(file_desc_t_ == 1);
     int msg_len = ::strlen(message) + 1;  // include '\0'
+    std::cout << "ForkPipe::Write:\t" << msg_len << " bytes sent.\n";
     if (::write(file_desc_[file_desc_t_], message, msg_len) == msg_len)
       return nullptr;
     else
-      return ::strerror(errno);
+      return std::strerror(errno);
   }
 
 
@@ -119,7 +120,7 @@ class ForkPipe {
     if (::close(file_desc_[descriptor]) == 0)
       return nullptr;
     else
-      return ::strerror(errno);
+      return std::strerror(errno);
   }
 
 
@@ -136,20 +137,21 @@ int main(int argc, char* argv[]) {
   int child_pid = ::fork();
 
   if (child_pid > 0) {  // parent
+    std::cout << "Parent:\t\t\tSetting pipe and listening for child.\n";
     pipe.SetReader();
     const char *message = pipe.Read();
 
-    std::cout << "Parent says:\tChild sent: \"" << message << "\"\n";
+    std::cout << "Parent:\t\t\tChild sent: \"" << message << "\"\n";
     delete [] message;
     
-    std::cout << "Parent says:\tMessage received, exiting." << std::endl;
+    std::cout << "Parent:\t\t\tMessage received, exiting." << std::endl;
 
   } else if (child_pid == 0) {  // child
     pipe.SetWriter();
     pipe.Write("Hello from your child!");
-    std::cout << "Child says:\tMessage sent, exiting." << std::endl;
+    std::cout << "Child:\t\t\tMessage sent, exiting." << std::endl;
   } else {
-      std::cerr << "Fork failed with error, \"" << ::strerror(errno) << "\"\n";
+      std::cerr << "Fork failed with error, \"" << std::strerror(errno) << "\"\n";
       return -1;
   }
 
