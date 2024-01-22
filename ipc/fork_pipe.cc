@@ -131,6 +131,14 @@ class ForkPipe {
 };
 
 
+void PrintCString(std::ostream* cout, const char* c_string) {
+  *cout << "{ ";
+  for (std::size_t i = 0; c_string[i]; ++i)
+    *cout << c_string[i] << ", ";
+  *cout << "\\0 }";
+}
+
+
 int main(int argc, char* argv[]) {
   ForkPipe pipe;
 
@@ -143,16 +151,15 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Parent:\t\t\tChild sent: \"" << message << "\"\n";
     delete [] message;
-<<<<<<< HEAD
     
     std::cout << "Parent:\t\t\tMessage received, exiting." << std::endl;
-=======
 
-    std::cout << "Parent says:\tMessage received, exiting." << std::endl;
->>>>>>> 372c3ba888cfcd889b730d0dee28f7102d81bc4e
 
   } else if (child_pid == 0) {  // child
     pipe.SetWriter();
+    std::cout << "Sending:\n\t";
+    PrintCString(&std::cout, "Hello from your child!");
+    std::cout << '\n';
     pipe.Write("Hello from your child!");
     std::cout << "Child:\t\t\tMessage sent, exiting." << std::endl;
   } else {
