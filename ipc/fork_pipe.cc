@@ -153,8 +153,6 @@ int main(int argc, char* argv[]) {
     delete [] message;
     
     std::cout << "Parent:\t\t\tMessage received, exiting." << std::endl;
-
-
   } else if (child_pid == 0) {  // child
     pipe.SetWriter();
     std::cout << "Sending:\n\t";
