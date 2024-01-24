@@ -1,4 +1,4 @@
-// Copyright 2023 CSCE 311
+// Copyright 2024 CSCE 311
 //
 #ifndef IPC_DOMAIN_SOCK_SERVER_H_
 #define IPC_DOMAIN_SOCK_SERVER_H_

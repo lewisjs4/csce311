@@ -1,4 +1,4 @@
-// Copyright 2023 CSCE 311
+// Copyright 2024 CSCE 311
 //
 
 #include <sys/stat.h>  // Unix header for stat, using mkfifo

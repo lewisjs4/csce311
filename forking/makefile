@@ -1,8 +1,8 @@
-# Copyright 2023 CSCE 311
+# Copyright 2024 CSCE 311
 
 cc = g++  # use g++ compiler
 path = ..
-standard = c++17
+standard = c++2a
 
 flags = -std=$(standard)  # compile with standard
 flags += -Wall  # compile with all warnings
