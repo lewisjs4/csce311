@@ -42,13 +42,14 @@ void Lock(std::size_t i) {
 
   for (std::size_t j = 0; j < kThread_no; ++j) {
     // wait for thread j to enter the queue
-    while (entering[j]) {}  // do nothing
+    while (entering[j])
+      continue;  // do nothing
 
     // process all threads at higher priority (or lower index) in queue
-    while (::number[j] != 0
+    while (number[j] != 0
            && (number[j] < number[i]
-           || (number[j] == number[i] && j < i))) {}
-             // do nothing
+               || (number[j] == number[i] && j < i) ))
+      continue;  // do nothing
   }
 }
 
