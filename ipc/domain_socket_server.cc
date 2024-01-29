@@ -25,9 +25,9 @@ void DomainSocketServer::Run() {
 
   while (true) {
     // (4) Accept connection from a client
-    socket_fd = accept(socket_fd_, nullptr, nullptr);
+    socket_fd = ::accept(socket_fd_, nullptr, nullptr);
     if (socket_fd  < 0) {
-      std::cerr << "Socket connection: " << strerror(errno) << std::endl;
+      std::cerr << "Socket connection: " << ::strerror(errno) << std::endl;
       continue;
     }
     std::cout << "Client connected" << std::endl;
