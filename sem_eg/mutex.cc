@@ -26,8 +26,8 @@ class Thread {
     Thread *thread_i = static_cast<Thread*>(arg);  // information about
                                                    // executing thread
 
-    ::ThreadSemaphoreManager::Down();
     // begin critical section
+    ::ThreadSemaphoreManager::Down();
 
     for (size_t i = 0; i < 5; ++i) {
       std::cout << thread_i->message_ << ' ';
