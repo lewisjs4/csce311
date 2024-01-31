@@ -75,8 +75,10 @@ void* WorkerThread(void* arg) {
   ThreadData *argv = static_cast<ThreadData *>(arg);
 
   Lock(argv->index);
+  // begin critical section
   for (int i = 0; i < kThread_increments; ++i)
     ++(*(argv->sum));
+  // end critical section
   Unlock(argv->index);
 
   return nullptr;
