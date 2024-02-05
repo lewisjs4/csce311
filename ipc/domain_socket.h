@@ -27,7 +27,7 @@ class DomainSocket {
   /// @param abstract Defaults to abstract socket path names, pass false for
   ///                 non-abstract naming.
   ///
-  static const char kEoT = static_cast<char>(3);
+  static const char kEoT = static_cast<char>(4);
 
   explicit DomainSocket(const char *socket_path, bool abstract = true);
 
