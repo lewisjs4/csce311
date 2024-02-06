@@ -128,9 +128,10 @@ int main(/* int argc, char* argv[] */) {
                    ::Consumer::StartRoutine,  // pointer to function
                    static_cast<void *>(&consumer));  // thread index
   while(true);
-  ::pthread_join(producer.id(), nullptr);  // wait for parent to finish
-  for (auto& consumer : consumers)
-    ::pthread_join(consumer.id(), nullptr);  // wait for children to finish
+
+  ::pthread_join(producer.thread_id(), nullptr);  // block until parent finish
+  for (auto& consumer : consumers)  // block until all consumers finish
+    ::pthread_join(consumer.thread_id(), nullptr);
 
   ::SemaphoreManager::Destroy();
 
@@ -175,8 +176,9 @@ void* Producer::StartRoutine(void* ptr) {
   auto producer = reinterpret_cast<Producer *>(ptr);
 
   while (true) {
-    std::string str_index = std::to_string(producer->buffer_index_);
-    PrintThreaded("Producer: producing at buffer[" + str_index + "]\n");
+    PrintThreaded("Producer: producing at buffer["
+                  + std::to_string(producer->buffer_index_)
+                  + "]\n");
 
     ::sleep(kProductionTime);
 
@@ -184,13 +186,11 @@ void* Producer::StartRoutine(void* ptr) {
 
     ::SemaphoreManager::Down(SemaphoreId::kBufferLock);
 
+    int time = kMinConsumptionTime
+                 + ::rand() % (kMaxConsumptionTime - kMinConsumptionTime + 1);
+    producer->buffer_->at(producer->buffer_index_) = time;
 
-    producer->buffer_->at(producer->buffer_index_)
-      = kMinConsumptionTime + ::rand() % (kMaxConsumptionTime
-        - kMinConsumptionTime + 1);
-
-
-    PrintThreaded(std::string("  Producer: completed buffer[")
+    PrintThreaded("  Producer: completed buffer["
                   + std::to_string(producer->buffer_index_)
                   + "]\n");
 
