@@ -39,3 +39,6 @@ ipc/latex
 ipc/html
 *Doxyfile
 
+# Private dirs
+proj*
+
