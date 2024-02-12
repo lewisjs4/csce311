@@ -12,7 +12,7 @@ DomainSocket::DomainSocket(const char *socket_path, bool abstract) {
   sock_addr_ = {};  // init struct (replaces memset from C)
   sock_addr_.sun_family = AF_UNIX;  // set to Unix domain socket (e.g. instead
                                     //   of internet domain socket)
-  if (abstract)                                  
+  if (abstract)
     // leaving leading null char sets abstract socket
     strncpy(sock_addr_.sun_path + 1,           // strncpy to limit copy for
             socket_path,                       //   portability
@@ -55,7 +55,26 @@ bool DomainSocket::Bind() {
 }
 
 
-bool DomainSocket::Connect() {
+bool DomainSocket::Listen(std::size_t max_connections) const {
+  if (!listen(socket_fd_, max_connections))  // yet again 0 is success
+    return true;
+
+  std::cerr << "DomainSocket::Listen, " << strerror(errno) << std::endl;
+  return false;
+}
+
+
+bool DomainSocket::Accept(int* req_socket_fd) const {
+    *req_socket_fd = accept(socket_fd_, nullptr, nullptr);
+    if (req_socket_fd)
+      return true;
+
+    std::cerr << "DomainSocket::Accept(), " <<  strerror(errno) << std::endl;
+    return false;
+}
+
+
+bool DomainSocket::Connect() const {
   if (!connect(socket_fd_,  // returns 0 if successful, again...
               // sockaddr_un type can be a Unix sockaddr
               reinterpret_cast<const sockaddr*>(&sock_addr_),
@@ -67,22 +86,19 @@ bool DomainSocket::Connect() {
 }
 
 
-bool DomainSocket::Listen(std::size_t max_connections) {
-  if (!listen(socket_fd_, max_connections))  // yet again 0 is success
-    return true;
+::ssize_t DomainSocket::Read(std::string* output,
+                             int socket_fd,
+                             ::ssize_t return_after_bytes,
+                             char eot) const {
+  if (!socket_fd)
+    socket_fd = socket_fd_;
 
-  std::cerr << "DomainSocket::Listen, " << strerror(errno) << std::endl;
-  return false;
-}
-
-
-::ssize_t DomainSocket::Read(std::string* output, int socket_fd, char eot) {
   const size_t kBufferSize = 64;  // buffer is in stack, keep it small
   char buffer[kBufferSize];
 
   // read socket up to buffer size
   ::ssize_t total_bytes_read, bytes_read;
-  total_bytes_read = bytes_read = read(socket_fd, buffer, kBufferSize);
+  total_bytes_read = bytes_read = ::read(socket_fd, buffer, kBufferSize);
 
   if (bytes_read == 0) {
     // writer disconnected
@@ -92,8 +108,9 @@ bool DomainSocket::Listen(std::size_t max_connections) {
     return total_bytes_read;
   }
 
-  // if there is more to read, accumulate and repeat 
-  while (buffer[bytes_read - 1] != eot) {
+  // if there is more to read, accumulate and repeat
+  while (buffer[bytes_read - 1] != eot
+      || (return_after_bytes && bytes_read < return_after_bytes)) {
     // include previous read
     output->insert(output->size(), buffer, bytes_read);
 
@@ -106,7 +123,6 @@ bool DomainSocket::Listen(std::size_t max_connections) {
       std::cerr << "Read Error: " << ::strerror(errno) << std::endl;
       return total_bytes_read;
     }
-
   }
 
   // do not include end of transmission char
@@ -116,7 +132,12 @@ bool DomainSocket::Listen(std::size_t max_connections) {
 }
 
 
-::ssize_t DomainSocket::Write(const std::string& bytes, char eot) {
+::ssize_t DomainSocket::Write(const std::string& bytes,
+                              int socket_fd,
+                              char eot) const {
+  if (!socket_fd)
+    socket_fd = socket_fd_;
+
   ::ssize_t bytes_wrote, total_bytes_wrote = 0;
 
   if (socket_fd_ <= 0) {
@@ -126,20 +147,20 @@ bool DomainSocket::Listen(std::size_t max_connections) {
   }
 
   do {
-    bytes_wrote = write(socket_fd_,
-                        bytes.c_str() + total_bytes_wrote,
-                        bytes.size() + 1);  // send cstring null term, i.e. \0
+    bytes_wrote = ::write(socket_fd,
+                          bytes.c_str() + total_bytes_wrote,
+                          bytes.size() + 1);  // send cstring null term, i.e. \0
     if (bytes_wrote < 0) {
       std::cerr << "Write Error: " << ::strerror(errno) << std::endl;
 
       return bytes_wrote;
     }
     total_bytes_wrote += bytes_wrote;  // accumulate bytes written
-  } while (total_bytes_wrote < static_cast<long int>(bytes.size() + 1));
+  } while (total_bytes_wrote < static_cast<::ssize_t>(bytes.size() + 1));
 
   // send end of transmission character
   const char kTerminateMessage[] = { eot };
-  bytes_wrote = write(socket_fd_, kTerminateMessage, sizeof(kTerminateMessage));
+  bytes_wrote = write(socket_fd, kTerminateMessage, sizeof(kTerminateMessage));
   if (bytes_wrote < 0) {
       std::cerr << "Write Error: " << ::strerror(errno) << std::endl;
 
@@ -149,3 +170,9 @@ bool DomainSocket::Listen(std::size_t max_connections) {
   return total_bytes_wrote + 1;  // + eot char
 }
 
+void DomainSocket::Close(int socket_file_descriptor) const {
+  if (socket_file_descriptor)
+    ::close(socket_file_descriptor);
+  else
+    ::close(socket_fd_);
+}
