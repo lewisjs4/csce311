@@ -149,14 +149,14 @@ bool DomainSocket::Connect() const {
   do {
     bytes_wrote = ::write(socket_fd,
                           bytes.c_str() + total_bytes_wrote,
-                          bytes.size() + 1);  // send cstring null term, i.e. \0
+                          bytes.size());  // send cstring null term, i.e. \0
     if (bytes_wrote < 0) {
       std::cerr << "Write Error: " << ::strerror(errno) << std::endl;
 
       return bytes_wrote;
     }
     total_bytes_wrote += bytes_wrote;  // accumulate bytes written
-  } while (total_bytes_wrote < static_cast<::ssize_t>(bytes.size() + 1));
+  } while (total_bytes_wrote < static_cast<::ssize_t>(bytes.size()));
 
   // send end of transmission character
   const char kTerminateMessage[] = { eot };
