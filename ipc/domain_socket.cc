@@ -88,7 +88,7 @@ bool DomainSocket::Connect() const {
 
 ::ssize_t DomainSocket::Read(std::string* output,
                              int socket_fd,
-                             ::ssize_t byte_count,
+                             std::size_t byte_count,
                              char eot) const {
   if (!socket_fd)
     socket_fd = socket_fd_;
@@ -97,42 +97,52 @@ bool DomainSocket::Connect() const {
   char buffer[kBufferSize];
 
   // read socket up to buffer size
-  ::ssize_t total_bytes_read, bytes_read;
-  total_bytes_read = bytes_read = ::read(socket_fd,
-                                         buffer,
-                                         byte_count ? byte_count : kBufferSize);
-
-  if (bytes_read == 0) {
-    // writer disconnected
-    return total_bytes_read;
-  } else if (bytes_read < 0) {
-    std::cerr << "Read Error: " << ::strerror(errno) << std::endl;
-    return total_bytes_read;
-  }
+  ::ssize_t bytes_read = Read(socket_fd,
+                              buffer,
+                              byte_count ? byte_count : kBufferSize);
+  if (bytes_read <= 0)
+    return bytes_read;
+  ::ssize_t total_bytes_read = bytes_read;
 
   // if there is more to read, accumulate and repeat
   while (buffer[bytes_read - 1] != eot
-      || (byte_count && bytes_read < byte_count)) {
-    // include previous read
+      // cast is safe here because bytes_read < 0 is handled after each ::read
+      || (byte_count && static_cast<std::size_t>(bytes_read) < byte_count)) {
+    // append previous read
     output->insert(output->size(), buffer, bytes_read);
 
-    bytes_read = read(socket_fd, buffer, kBufferSize);
+    // make next read based on presence of byte_count value
+    bytes_read = Read(socket_fd,
+                      buffer,
+                      // bytes_read will be strictly less than byte_count at
+                      // this point, if byte_count > 0
+                      byte_count ? byte_count - total_bytes_read : kBufferSize);
+    if (bytes_read <= 0)
+      return total_bytes_read;
     total_bytes_read += bytes_read;
-    if (bytes_read == 0) {
-      // connection terminated by writer
-      return total_bytes_read;
-    } else if (bytes_read < 0) {
-      std::cerr << "Read Error: " << ::strerror(errno) << std::endl;
-      return total_bytes_read;
-    }
   }
 
-  // do not include end of transmission char
-  output->insert(output->size(), buffer, bytes_read - 1);
+  // do not include end of transmission char unless it is included in byte_count
+  output->insert(output->size(), buffer, byte_count ? bytes_read : bytes_read - 1);
 
   return total_bytes_read;
 }
 
+
+::ssize_t DomainSocket::Read(int socket_fd,
+                             char buffer[],
+                             std::size_t buffer_size) const {
+  ::ssize_t bytes_read = ::read(socket_fd, buffer, buffer_size);
+
+  if (bytes_read == 0) {
+    // connection terminated by writer
+    std::cout << "Writer disconnected" << std::endl;
+  } else if (bytes_read < 0) {
+    std::cerr << "Read Error: " << ::strerror(errno) << std::endl;
+  }
+
+  return bytes_read;
+}
 
 ::ssize_t DomainSocket::Write(const std::string& bytes,
                               int socket_fd,

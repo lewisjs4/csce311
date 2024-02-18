@@ -56,7 +56,7 @@ class DomainSocket {
   // have defaults
   ::ssize_t Read(std::string* buffer,
                  int socket_file_descriptor = 0,  // 0 uses member socket_fd_
-                 ::ssize_t return_after_bytes = 0,  // 0 reads until EoT char
+                 std::size_t return_after_bytes = 0,  // 0 reads until EoT char
                  char end_of_transmission = DomainSocket::kEoT) const;
 
 
@@ -73,6 +73,11 @@ class DomainSocket {
   ::sockaddr_un sock_addr_;  // socket address from sys/un.h
 
   std::string socket_path_;  // std::string stores socket_path (no raw pointers)
+
+ private:
+  // This method allows error-checking and messages to be isolated from
+  // provided read method
+  ::ssize_t Read(int socket_fd, char buffer[], std::size_t buffer_size) const;
 };
 
 #endif  // IPC_DOMAIN_SOCK_H_
