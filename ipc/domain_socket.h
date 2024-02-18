@@ -52,10 +52,11 @@ class DomainSocket {
   bool Connect() const;
 
 
-  // buffer is an output parameter
+  // Parameter buffer is an output parameter; must be first because all others
+  // have defaults
   ::ssize_t Read(std::string* buffer,
                  int socket_file_descriptor = 0,  // 0 uses member socket_fd_
-                 ::ssize_t return_after_bytes = 0,  // 0 reads until EoT
+                 ::ssize_t return_after_bytes = 0,  // 0 reads until EoT char
                  char end_of_transmission = DomainSocket::kEoT) const;
 
 

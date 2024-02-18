@@ -88,7 +88,7 @@ bool DomainSocket::Connect() const {
 
 ::ssize_t DomainSocket::Read(std::string* output,
                              int socket_fd,
-                             ::ssize_t return_after_bytes,
+                             ::ssize_t byte_count,
                              char eot) const {
   if (!socket_fd)
     socket_fd = socket_fd_;
@@ -98,7 +98,9 @@ bool DomainSocket::Connect() const {
 
   // read socket up to buffer size
   ::ssize_t total_bytes_read, bytes_read;
-  total_bytes_read = bytes_read = ::read(socket_fd, buffer, kBufferSize);
+  total_bytes_read = bytes_read = ::read(socket_fd,
+                                         buffer,
+                                         byte_count ? byte_count : kBufferSize);
 
   if (bytes_read == 0) {
     // writer disconnected
@@ -110,7 +112,7 @@ bool DomainSocket::Connect() const {
 
   // if there is more to read, accumulate and repeat
   while (buffer[bytes_read - 1] != eot
-      || (return_after_bytes && bytes_read < return_after_bytes)) {
+      || (byte_count && bytes_read < byte_count)) {
     // include previous read
     output->insert(output->size(), buffer, bytes_read);
 
