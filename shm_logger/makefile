@@ -1,4 +1,4 @@
-# Copyright 2023 CSCE 311
+# Copyright 2024 CSCE 311
 
 cc = g++  # use g++ compiler
 path = ..

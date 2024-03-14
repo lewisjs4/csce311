@@ -1,4 +1,4 @@
-// Copyright 2022 CSCE 311
+// Copyright 2024 CSCE 311
 //
 
 #include <shm_logger/consumer.h>

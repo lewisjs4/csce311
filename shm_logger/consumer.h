@@ -1,4 +1,4 @@
-// Copyright 2023 CSCE 311
+// Copyright 2024 CSCE 311
 //
 #ifndef SHM_LOGGER_CONSUMER_H_
 #define SHM_LOGGER_CONSUMER_H_
