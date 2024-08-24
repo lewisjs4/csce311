@@ -24,9 +24,9 @@
 const size_t kProductionTime = 1;  // time to produce a unit of work
 const size_t kMinConsumptionTime = 8;  // min time to consume a unit of work 
 const size_t kMaxConsumptionTime = 16;  // max time to consume a unit of work
-const size_t kNoConsumers = 4;  // number of consumers
+const size_t kNoConsumers = 25;  // number of consumers
 
-const size_t kBufferSize = 12;  // size of circular buffer
+const size_t kBufferSize = 16;  // size of circular buffer
 
 
 // Provides scoped names for the different semaphores and mutexes managed by
@@ -140,11 +140,12 @@ int main(/* int argc, char* argv[] */) {
 
 
 void* ::Consumer::StartRoutine(void *ptr) {
-  auto consumer = static_cast<::Consumer *>(ptr);
+  auto consumer = static_cast<::Consumer *>(ptr);  // equivalent to a this pointer
 
   while (true) {
+    // wait for available item
     ::SemaphoreManager::Down(::SemaphoreId::kItemsAvailable);
-
+    // remove item
     ::SemaphoreManager::Down(::SemaphoreId::kBufferLock);
 
     ::size_t consumption_time = consumer->buffer_->at(*consumer->buffer_index_);
@@ -157,6 +158,7 @@ void* ::Consumer::StartRoutine(void *ptr) {
       + ": consuming from buffer[" + print_index + "], "
       + std::to_string(consumption_time) + "s to complete\n");
 
+    // signal slot available
     ::SemaphoreManager::Up(::SemaphoreId::kBufferAvailable);
 
     ::SemaphoreManager::Up(::SemaphoreId::kBufferLock);
