@@ -1,5 +1,0 @@
-<map id="UnixDomainSocket" name="UnixDomainSocket">
-<area shape="rect" id="node1" title=" " alt="" coords="100,5,247,32"/>
-<area shape="rect" id="node2" href="$classDomainSocketClient.html" title=" " alt="" coords="5,80,160,107"/>
-<area shape="rect" id="node3" href="$classDomainSocketServer.html" title=" " alt="" coords="185,80,343,107"/>
-</map>
