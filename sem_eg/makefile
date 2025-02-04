@@ -1,4 +1,4 @@
-# Copyright 2024 CSCE 311
+# Copyright 2025 CSCE 311
 
 cc = g++  # use g++ compiler
 path = ..
@@ -16,7 +16,7 @@ link = $(cc) $(linker_flags) -o  # final linked build to binary executable
 
 compile = $(cc) $(flags) -c -o  # compilation to intermediary .o files
 
-executables = barrier multiplex mutex producer-consumer readers-writers signal 
+executables = barrier monitor monitor-cond-var multiplex mutex producer-consumer readers-writers signal 
 
 all : $(executables)
 	@echo "All Executables Built"
@@ -24,6 +24,12 @@ all : $(executables)
 # executables
 #
 barrier : barrier.o thread_sem_manager.o
+	$(link) $@ $^
+#
+monitor : monitor.o thread_sem_manager.o
+	$(link) $@ $^
+#
+monitor-cond-var : monitor_cond_var.o thread_sem_manager.o
 	$(link) $@ $^
 #
 multiplex : multiplex.o thread_sem_manager.o
@@ -44,6 +50,12 @@ signal : signal.o thread_sem_manager.o
 # objects
 #
 barrier.o : barrier.cc thread_sem_manager.h thread.h
+	$(compile) $@ $<
+#
+monitor.o : monitor.cc thread_sem_manager.h
+	$(compile) $@ $<
+#
+monitor_cond_var.o : monitor_cond_var.cc
 	$(compile) $@ $<
 #
 multiplex.o : multiplex.cc thread_sem_manager.h

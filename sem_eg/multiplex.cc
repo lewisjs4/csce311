@@ -1,4 +1,4 @@
-// Copyright 2024 CSCE 311
+// Copyright 2025 CSCE 311
 //
 // This code explores the multiplex problem---that is: allowing n threads
 // access to m resources where n is assumed to be larger (perhaps much larger)

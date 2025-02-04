@@ -1,4 +1,4 @@
-// Copyright 2024 CSCE 311
+// Copyright 2025 CSCE 311
 //
 // This wrapper class allows the managment of one or more semaphores for
 // threads. It is not intended for use between processes.

@@ -1,4 +1,4 @@
-// Copyright 2024 CSCE 311
+// Copyright CSCE 311 SP25
 //
 // Provides a parent class that allows a virtual static method for the
 // ``start_routine'' of ::pthread_create.

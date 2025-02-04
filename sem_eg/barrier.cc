@@ -1,4 +1,4 @@
-// Copyright 2024 CSCE 311
+// Copyright 2025 CSCE 311
 //
 
 #include <sem_eg/thread.h>
