@@ -10,7 +10,7 @@ std::vector<::sem_t> ThreadSemaphoreManager::semaphores_
   = std::vector<::sem_t>();
 
 
-size_t ::ThreadSemaphoreManager::Create(std::size_t count, std::size_t index) {
+::size_t ::ThreadSemaphoreManager::Create(std::size_t count, std::size_t index) {
   assert(index <= semaphores_.size());
 
   if (index == semaphores_.size()) {
