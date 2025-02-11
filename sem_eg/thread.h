@@ -9,12 +9,12 @@
 #define SEM_EG_THREAD_H_
 
 #include <pthread.h>  // POSIX threads (use flag -pthread in g++)
-
+#include <cstddef>
 
 template <class T>
 class Thread {
  public:
-  inline Thread(const ::pthread_t& thread_id, ::size_t internal_id)
+  inline Thread(const ::pthread_t& thread_id, std::size_t internal_id)
       : thread_id_(thread_id), internal_id_(internal_id) {  /* empty */ }
 
   inline static void *Execute(void *arg) {
