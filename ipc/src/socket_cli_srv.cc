@@ -1,4 +1,4 @@
-// Copyright 2024 CSCE 311
+// Copyright 2025 CSCE 311
 //
 
 #include <sys/socket.h>  // Unix header for sockets, using socket
@@ -32,9 +32,8 @@ class UnixDomainSocket {
     sock_addr_.sun_family = AF_UNIX;  // set to Unix domain socket (e.g. instead
                                       //   of internet domain socket)
     if (abstract) {
-      // leaving leading/trailing null chars sets abstract socket
+      // leaving leading null byte sets abstract socket path (Linux-specific feature)
       sock_addr_.sun_path[0] = '\0';
-      sock_addr_.sun_path[sizeof(sock_addr_.sun_path - 1)] = '\0';
       strncpy(sock_addr_.sun_path + 1,           // strncpy to limit copy for
               socket_path,                       //   portability
               sizeof(sock_addr_.sun_path) - 1);  // -2 for leading/trailing \0s
@@ -53,9 +52,9 @@ class UnixDomainSocket {
 };
 
 
-///
-/// Domain Socket Server C++ Interface Class
-///
+//
+// Domain Socket Server C++ Interface Class
+//
 class DomainSocketServer : public UnixDomainSocket {
  public:
   using ::UnixDomainSocket::UnixDomainSocket;
@@ -79,6 +78,7 @@ class DomainSocketServer : public UnixDomainSocket {
                                    //   exists (using Unix system calls for
                                    //   sockets, no reason to be non-Unix
                                    //   portable now).  :-/
+                                   // Note: abstract sockets do not create files
     int success = bind(sock_fd,
                        // sockaddr_un is a Unix sockaddr and so may be cast "up"
                        //   to that pointer type (think of it as C polymorphism)
@@ -95,15 +95,15 @@ class DomainSocketServer : public UnixDomainSocket {
     }
 
     // (3) Listen for connections from clients
-    size_t kMax_client_conns = 5;
+    constexpr ::size_t kMax_client_conns = 5;  // max # of pending connections
     success = listen(sock_fd, kMax_client_conns);
     if (success < 0) {
       std::cerr << strerror(errno) << std::endl;
       exit(-1);
     }
 
-    const size_t kRead_buffer_size = 32;  // read 4 byte increaments
-    char read_buffer[kRead_buffer_size];
+    const size_t kReadBufferSize = 32;  // read 32 byte chunks
+    char read_buffer[kReadBufferSize];
     int bytes_read;
     while (true) {
       // (4) Accept connection from a client
@@ -120,7 +120,7 @@ class DomainSocketServer : public UnixDomainSocket {
       const char kKill_msg[] = "quit";  // TODO(lewisjs): trim whitespace
                                         //   from read_buffer for comparison
       while (bytes_read > 0) {
-        bytes_read = read(client_req_sock_fd, read_buffer, kRead_buffer_size);
+        bytes_read = read(client_req_sock_fd, read_buffer, kReadBufferSize);
 
         if (strcmp(read_buffer, kKill_msg) == 0) {
           std::cout << "Server shutting down..." << std::endl;
@@ -138,9 +138,9 @@ class DomainSocketServer : public UnixDomainSocket {
 
         close(client_req_sock_fd);
       } else if (bytes_read < 0) {
-        std::cerr << strerror(errno) << std::endl;
+        std::cerr << "Read error: " << strerror(errno) << std::endl;
 
-        exit(-1);
+        exit(-1);  // possibly not quit for one client error
       }
     }
   }
@@ -180,11 +180,20 @@ class DomainSocketClient : public UnixDomainSocket {
       while (std::cin.gcount() > 0) {
         if (std::cin.gcount() == kWrite_buffer_size - 1 && std::cin.fail())
           std::cin.clear();
-        // write() is equivalent to send() with no flags in send's 3rd param
+
+        // write() is equivalent to send() with no flags in send's 3rd param.
+        // std::cin.gcount() returns the number of characters extracted by the
+        // last input operation.
         ssize_t bytes_wrote = write(socket_fd, write_buffer, std::cin.gcount());
         std::cout << "sent " << std::cin.gcount() << " bytes" << std::endl;
-        if (bytes_wrote < 0) {
+        if (bytes_wrote < 0 && errno == EPIPE) {
+          // NOTE you may recieve SIGPIPE, which, if ignored, terminates
+          // your app. Typically, you do not register a signal handler for
+          // SIGPIPE, you just ignore:
+          //   signal(SIGPIPE, SIG_IGN);
+          // server dropped connection with client still writing
           std::cerr << strerror(errno) << std::endl;
+          std::cerr << "Server closed connection (EPIPE)" << std::endl;
 
           exit(-1);
         }
