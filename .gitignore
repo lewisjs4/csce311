@@ -1,0 +1,54 @@
+# Compiled object files
+*.o
+*.obj
+*.lo
+*.la
+*.a
+*.lib
+
+# Executable files
+*.exe
+*.out
+*.app
+*.dll
+*.so
+*.dylib
+
+# Debugging & Profiling Files
+*.dSYM/
+*.gcno
+*.gcda
+*.gcov
+*.prof
+*.profraw
+
+# Editor & IDE Specific Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# CMake & Build System Artifacts
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+#build/
+Debug/
+Release/
+dist/
+
+# Dependency Files (C and C++ Compilers)
+*.d
+*.dep
+
+# Logs & Miscellaneous
+*.log
+*.pid
+*.tmp
+*.bak
+*.orig
+*.rej
+
+# Version Control
+.git/
