@@ -16,18 +16,20 @@ class BankAccount {
   static void Increment(int i) { increment_ = i; }
   static int Increment(void) { return increment_; }
 
-  static void Value(int v) { value_.store(v); }
-  static int Value(void) { return value_.load(); }
+  static void Value(int v) { value_ = v; }
+  static int Value(void) { return value_; }
 
  private:
   static int increment_;
-  static std::atomic<int> value_;
+  static int value_;
 };
 int BankAccount::increment_ = 0;
-std::atomic<int> BankAccount::value_{0};
+int BankAccount::value_{0};
 
 
+int lock = 0;
 void* increment(void*) {
+  down(thread_sem_);
   int value;
   for (int i = 0; i < BankAccount::Increment(); ++i) {
     value = BankAccount::Value();
@@ -35,6 +37,7 @@ void* increment(void*) {
     BankAccount::Value(value);
   }
   std::cout << value << '\n' << std::endl;
+  up(thread_sem_;
   return nullptr;
 }
 
